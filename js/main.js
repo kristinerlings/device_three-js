@@ -15,14 +15,14 @@ const size = {
 };
 
 const camera = new THREE.PerspectiveCamera(
-  45,
+  40,
   size.width / size.height,
   0.1,
   100
 );
-camera.position.x = 14;
-camera.position.y = 15;
-camera.position.z = 12;
+camera.position.x = 8;
+camera.position.y = 3;
+camera.position.z = 3;
 scene.add(camera);
 
 const orbitControls = new OrbitControls(camera, $canvas);
@@ -42,7 +42,7 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 const textureBlender = new THREE.TextureLoader().load(
   'assets/bakedTesting.jpg'
 );
-textureBlender.flipY = -1; //y axis of textures I load is inverted
+textureBlender.flipY = false; //y axis of textures I load is inverted. This is boolean... not -1 
 const material = new THREE.MeshBasicMaterial({ map: textureBlender });
 
 //CHECK documentation: shader material
@@ -79,6 +79,8 @@ loader.load(
       }
     });
     scene.add(gltf.scene);
+    //position scene it lower:
+    gltf.scene.position.y = -1.5;
 
     // gltf.animations; // Array<THREE.AnimationClip>
     // gltf.scene; // THREE.Group
