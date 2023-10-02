@@ -23,13 +23,13 @@ uniform vec3 u_color1;
 uniform vec3 u_color2;
 uniform float u_distance; 
 
-uniform vec2 iMouse;
-uniform float touchEffect;
+//uniform vec2 iMouse;
+//uniform float touchEffect;
 
 //pass uniforms to the fragment shader
 uniform float iTime;
 uniform vec2 iResolution;
-precision mediump float; //indicate medium precision for float - to work on mobile devices (change to highp for higher precision)
+precision mediump float; //indicate medium precision for float - to work on e.g. mobile devices 
 
 
 varying vec2 vUv; //varying = input to the fragment shader from the vertex shader
@@ -127,10 +127,10 @@ void main()
   gl_FragColor = vec4(u_backgroundColor.xyz, u_backgroundColor.w);
   mainImage(gl_FragColor, fragCoord);
 
-  float distanceFromMouse = distance(iMouse, fragCoord);
-  float colorEffect = max(0.0, 1.0 - distanceFromMouse / 30.0 * touchEffect);
-
-  gl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(1.0), colorEffect);
+ //mouse move interaction
+ // float distanceFromMouse = distance(iMouse, fragCoord);
+ // float colorEffect = max(0.0, 1.0 - distanceFromMouse / 30.0 * touchEffect);
+  //gl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(1.0), colorEffect);
 }
 
 
@@ -144,7 +144,7 @@ void main()
 
 
 /*
-//change mainImage to main (ThreeJS needs it to be called main)
+//new main
 //threejs doesn't use fragColor and fragCoord in the main function.. 
 
 //Modify my UV coordinates to fit threeJS naming conventions

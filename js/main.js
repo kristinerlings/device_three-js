@@ -9,6 +9,11 @@ import portalFragmentShader from './shaders/portal/fragment.glsl?raw';
 const $canvas = document.querySelector('.webglCanvas');
 const scene = new THREE.Scene();
 
+//https://threejs.org/docs/#api/en/core/Raycaster
+const raycaster = new THREE.Raycaster();
+const mousePointer = new THREE.Vector2();
+
+
 const size = {
   width: window.innerWidth,
   height: window.innerHeight,
@@ -54,7 +59,7 @@ const deviceDisplayPlaneMaterial = new THREE.ShaderMaterial({
   uniforms: {
     iTime: { value: 0.0 },
     iResolution: { value: new THREE.Vector2(size.width, size.height) },
-    iMouse: { value: new THREE.Vector2() },
+    //iMouse: { value: new THREE.Vector2() },
     touchEffect: { value: 0.0 },
     u_backgroundColor: { value: new THREE.Vector4(0.0, 0.3, 0.65, 0.6) }, // default color
     u_shapeMapIncrementNr: { value: 8 },
@@ -123,6 +128,10 @@ const initDraw = () => {
   //update time
   const timePassed = clock.getElapsedTime(); //get time passed since clock started - returns seconds passed and updates iTime
   deviceDisplayPlaneMaterial.uniforms.iTime.value = timePassed; //update iTime in my shader -
+
+
+  // hover button
+  hoverButton();
 
   //
   renderer.render(scene, camera); //draw the scene
@@ -217,13 +226,54 @@ $btnShapes.forEach(btn => {
 });
 
 
+// ========   Mouse click   ======== //
+let intersectedObjects = []; // Array of objects that intersect with the raycaster
+const hoverButton = () => {
+  //make transparent
+  raycaster.setFromCamera(mousePointer, camera); //get raycaster to know where the mouse is pointing
+  const intersects = raycaster.intersectObjects(scene.children, true); //get all the objects that intersects with the raycaster
+  //loop the intersects
+ 
+  // Reset all previously intersected objects
+  intersectedObjects.forEach((object) => {
+    object.material.transparent = false;
+    object.material.opacity = 1;
+  });
+
+  intersectedObjects = []; // Clear the array
+
+  // Set transparency for currently intersected objects
+  for (let i = 0; i < intersects.length; i++) {
+    intersects[i].object.material.transparent = true;
+    intersects[i].object.material.opacity = 0.5;
+    intersectedObjects.push(intersects[i].object); // Add to array for next frame
+  }
+  console.log(intersectedObjects.mesh[0].parent.children);
+
+}
+const pressButton = () => {
+
+}
+
 // ========   Mouse move   ======== //
 
-$canvas.addEventListener('mousemove', (event) => {
+/* $canvas.addEventListener('mousemove', (event) => {
   deviceDisplayPlaneMaterial.uniforms.iMouse.value.x = event.clientX;
   deviceDisplayPlaneMaterial.uniforms.iMouse.value.y = event.clientY;
   deviceDisplayPlaneMaterial.uniforms.touchEffect.value = 1.0;
-});
+}); */
+
+// ========   Raycasting  - store mouse coordinates  ======== //
+ const onPointerMove = (event) => {
+  // calculate pointer position in normalized device coordinates
+  // (-1 to +1) for both components
+
+  mousePointer.x = (event.clientX / window.innerWidth) * 2 - 1;
+  mousePointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
+}
+
+window.addEventListener('pointermove', onPointerMove); //listen to mouse move
+
 
 //on resize -> update size, camera and renderer
 window.addEventListener('resize', () => {
