@@ -136,6 +136,12 @@ const colorOptions = [
     backgroundColor: new THREE.Vector4(0.5, 0.2, 0.75, 0.9), // example color values
     // ...other colors or parameters for the shader
   },
+  {
+    backgroundColor: new THREE.Vector4(0.1, 0.8, 0.25, 0.3), // example color values
+  },
+  {
+    backgroundColor: new THREE.Vector4(0.9, 0.1, 0.25, 0.3), // example color values
+  }
 ];
 
 // update color in shader
@@ -145,11 +151,18 @@ const updateColorInShader = (colorOptions) => {
 };
 
 //listen to click on button
-document.querySelector('.btn__red').addEventListener('click', () => {
+/* document.querySelector('.btn__red').addEventListener('click', () => {
   updateColorInShader(colorOptions[1]);
   console.log(colorOptions[1]);
   console.log('red');
-});
+}); */
+document.querySelectorAll('.btn__color').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const color = btn.dataset.color;
+    updateColorInShader(colorOptions[color]);
+    console.log(color);
+  })
+})
 
 // ========   Mouse move   ======== //
 
