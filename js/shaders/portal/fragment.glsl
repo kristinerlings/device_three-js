@@ -18,12 +18,16 @@
 
 //Unforms for interactions
 uniform float u_shape;
-uniform float u_backgroundColor;
+uniform vec4 u_backgroundColor;
 uniform float u_distance; 
 
+uniform vec2 iMouse;
+uniform float touchEffect;
+
+//pass uniforms to the fragment shader
 uniform float iTime;
 uniform vec2 iResolution;
-precision mediump float; //Not sure if I want this.  indicate medium precision for float - to work on mobile devices (chang eto highp for higher precision)
+precision mediump float; //indicate medium precision for float - to work on mobile devices (change to highp for higher precision)
 
 
 varying vec2 vUv; //varying = input to the fragment shader from the vertex shader
@@ -41,7 +45,7 @@ vec2 rotate(vec2 p,float a){
     return p*mat2(c,s,-s,c);
 }
 
-// CHANGE SHAPE HERE? 
+// CHANGE SHAPE HERE? - shape defined here!
 //p= position of the ray
 float map(vec3 p){
     for( int i = 0; i<8; ++i){    //can adjust increment 
@@ -109,14 +113,20 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     if(col.a > 0.2) {
         fragColor = col; // Set the fragment color as calculated
     } else {
-        fragColor = vec4(0.0,0.3,0.65, 0.6);  // Set the background color 
+        fragColor = u_backgroundColor; // vec4(0.0,0.3,0.65, 0.6);  // Set the background color  0.0,0.3,0.65, 0.6
     }
 }
 
 void main()
 {
   vec2 fragCoord = iResolution * vUv;
+  gl_FragColor = vec4(u_backgroundColor.xyz, u_backgroundColor.w);
   mainImage(gl_FragColor, fragCoord);
+
+  float distanceFromMouse = distance(iMouse, fragCoord);
+  float colorEffect = max(0.0, 1.0 - distanceFromMouse / 30.0 * touchEffect);
+
+  gl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(1.0), colorEffect);
 }
 
 
@@ -134,7 +144,7 @@ void main()
 //threejs doesn't use fragColor and fragCoord in the main function.. 
 
 //Modify my UV coordinates to fit threeJS naming conventions
-//fragCoord = gl_FragCoord .xy; -> gives the current pixel coordinate
+//fragCoord = gl_FragCoord.xy; -> gives the current pixel coordinate
 
 // change output color fragColor => gl_FragColor
 */
