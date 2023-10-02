@@ -19,6 +19,8 @@
 //Unforms for interactions
 uniform int u_shapeMapIncrementNr;
 uniform vec4 u_backgroundColor;
+uniform vec3 u_color1;
+uniform vec3 u_color2;
 uniform float u_distance; 
 
 uniform vec2 iMouse;
@@ -35,8 +37,10 @@ varying vec2 vUv; //varying = input to the fragment shader from the vertex shade
 
 // green:rgb(221,196,112) + yellow: (221,196,112)  /255 each for floating point nr.
 vec3 palette(float d){
-    return mix(vec3(0.4235, 0.5843, 0.4588),vec3(0.8667, 0.7686, 0.4392),d);
-	//return mix(vec3(0.2,0.7,0.9),vec3(1.,0.,1.),d);
+    return mix(u_color1, u_color2, d);
+    //return mix(vec3(0.4235, 0.5843, 0.4588),vec3(0.8667, 0.7686, 0.4392), d);
+	
+    //return mix(vec3(0.2,0.7,0.9),vec3(1.,0.,1.),d);
 }
 
 vec2 rotate(vec2 p,float a){
