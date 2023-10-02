@@ -129,27 +129,40 @@ const initDraw = () => {
   window.requestAnimationFrame(initDraw); //call the draw function again to make it loop :D !
 };
 
+const colors = {
+  green: '#6C9575',
+  yellow: '#DDC470',
+  blue: '#0000ff',
+  orange: '#ffa500',
+  aqua: '#00ffff',
+  red: '#ff0000',
+  poisonGreen: '#00ff00',
+  cyan: '#00ff00',
+  lightBlue: '#004DA6',
+};
+
+
 // ======== CHANGE COLORS ======= //
 const colorOptions = [
   {
-    backgroundColor: new THREE.Vector4(0.0, 0.3, 0.65, 0.6),
-    color1: new THREE.Color(0x00ff00), //red
-    color2: new THREE.Color(0x00ff00), //green
+    backgroundColor: new THREE.Vector4(0.0, 0.3, 0.65, 0.6), //blue
+    color1: new THREE.Color(colors.green), 
+    color2: new THREE.Color(colors.yellow), 
   },
   {
-    backgroundColor: new THREE.Vector4(0.5, 0.2, 0.75, 0.9), 
-    color1: new THREE.Color(0x0000ff), //blue
-    color2: new THREE.Color(0xffa500), //orange
+    backgroundColor: new THREE.Vector4(1.0, 0.8, 0.81, 0.9), //pink
+    color1: new THREE.Color(colors.blue), 
+    color2: new THREE.Color(colors.orange), 
   },
   {
-    backgroundColor: new THREE.Vector4(0.1, 0.8, 0.25, 0.3),
-    color1: new THREE.Color(0x00ffff), // cyan
-    color2: new THREE.Color(0xff0000), // red
+    backgroundColor: new THREE.Vector4(0.1, 0.4, 0.25, 0.6), //green
+    color1: new THREE.Color(colors.aqua), 
+    color2: new THREE.Color(colors.red), 
   },
   {
-    backgroundColor: new THREE.Vector4(0.9, 0.1, 0.25, 0.3), 
-    color1: new THREE.Color(0x00ff00), // green
-    color2: new THREE.Color(0x0000ff), //blue
+    backgroundColor: new THREE.Vector4(0.2, 0.2, 0.75, 0.9), //purple
+    color1: new THREE.Color(colors.poisonGreen), 
+    color2: new THREE.Color(colors.blue), 
   },
 ];
 
