@@ -57,6 +57,7 @@ const deviceDisplayPlaneMaterial = new THREE.ShaderMaterial({
     iMouse: { value: new THREE.Vector2() },
     touchEffect: { value: 0.0 },
     u_backgroundColor: { value: new THREE.Vector4(0.0, 0.3, 0.65, 0.6) }, // default color
+    u_shapeMapIncrementNr: { value: 8 },
   },
   vertexShader: portalVertexShader,
   fragmentShader: portalFragmentShader,
@@ -144,11 +145,21 @@ const colorOptions = [
   }
 ];
 
+const shapeOptions = {
+  default: { incrementNr: 8 },
+  increment: { incrementNr: 20 }
+};
+
 // update color in shader
 const updateColorInShader = (colorOptions) => {
   deviceDisplayPlaneMaterial.uniforms.u_backgroundColor.value =
     colorOptions.backgroundColor;
 };
+
+ const updateShapeInShader = (shapeOptions) => {
+  deviceDisplayPlaneMaterial.uniforms.u_shapeMapIncrementNr.value =
+    shapeOptions.incrementNr;
+  }
 
 //listen to click on button
 /* document.querySelector('.btn__red').addEventListener('click', () => {
@@ -156,13 +167,24 @@ const updateColorInShader = (colorOptions) => {
   console.log(colorOptions[1]);
   console.log('red');
 }); */
-document.querySelectorAll('.btn__color').forEach(btn => {
+const $btnColors = document.querySelectorAll('.btn__color');
+$btnColors.forEach(btn => {
   btn.addEventListener('click', () => {
     const color = btn.dataset.color;
     updateColorInShader(colorOptions[color]);
     console.log(color);
   })
 })
+
+const $btnShapes = document.querySelectorAll('.btn__shape');
+$btnShapes.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const shape = btn.dataset.shape;
+    updateShapeInShader(shapeOptions[shape]);
+    console.log(shape);
+  })
+});
+
 
 // ========   Mouse move   ======== //
 

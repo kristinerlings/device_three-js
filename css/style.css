@@ -24,19 +24,3 @@ button{
     z-index: 2;
     position: relative; 
 }
-
-.btn__red {
-    background-color: red;
-}
-
-.btn__green {
-    background-color: green;
-}
-
-.btn__yellow {
-    background-color: yellow;
-}
-
-.btn__blue {
-    background-color: blue;
-}

@@ -17,7 +17,7 @@
 
 
 //Unforms for interactions
-uniform float u_shape;
+uniform int u_shapeMapIncrementNr;
 uniform vec4 u_backgroundColor;
 uniform float u_distance; 
 
@@ -48,14 +48,14 @@ vec2 rotate(vec2 p,float a){
 // CHANGE SHAPE HERE? - shape defined here!
 //p= position of the ray
 float map(vec3 p){
-    for( int i = 0; i<8; ++i){    //can adjust increment 
+    for( int i = 0; i<u_shapeMapIncrementNr; ++i){    //can adjust increment 
         float t = iTime*0.1; //adjusted time, it was too fast - from 2 to 1
         //p.xz =rotate(p.xz,t);
         p.xz =rotate(p.xz,t*1.25); //adjust to change the rotation speed
         //p.xy =rotate(p.xy,t*1.89);
         p.xy =rotate(p.xy,t*2.0);
         p.xz = abs(p.xz);
-        //p.xz-=.5;
+        //p.xz-=.6;
         p.xz-=.2; //adjust to change the shape of the pyramid
 	}
 	return dot(sign(p),p)/6.;
