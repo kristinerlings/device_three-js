@@ -133,25 +133,23 @@ const initDraw = () => {
 const colorOptions = [
   {
     backgroundColor: new THREE.Vector4(0.0, 0.3, 0.65, 0.6),
-    color1: new THREE.Vector3(0.4235, 0.5843, 0.4588), //red
-    color2: new THREE.Vector3(0.8667, 0.7686, 0.4392), //green
-    // ...other colors or parameters for the shader
+    color1: new THREE.Color(0x00ff00), //red
+    color2: new THREE.Color(0x00ff00), //green
   },
   {
-    backgroundColor: new THREE.Vector4(0.5, 0.2, 0.75, 0.9), // example color values
-    // ...other colors or parameters for the shader
-    color1: new THREE.Vector3(0.4235, 0.5843, 0.4588), //red
-    color2: new THREE.Vector3(0.8667, 0.7686, 0.4392), //green
+    backgroundColor: new THREE.Vector4(0.5, 0.2, 0.75, 0.9), 
+    color1: new THREE.Color(0x0000ff), //blue
+    color2: new THREE.Color(0xffa500), //orange
   },
   {
-    backgroundColor: new THREE.Vector4(0.1, 0.8, 0.25, 0.3), // example color values
-    color1: new THREE.Vector3(0.4235, 0.5843, 0.4588), //red
-    color2: new THREE.Vector3(0.8667, 0.7686, 0.4392), //green
+    backgroundColor: new THREE.Vector4(0.1, 0.8, 0.25, 0.3),
+    color1: new THREE.Color(0x00ffff), // cyan
+    color2: new THREE.Color(0xff0000), // red
   },
   {
-    backgroundColor: new THREE.Vector4(0.9, 0.1, 0.25, 0.3), // example color values
-    color1: new THREE.Vector3(0.4235, 0.5843, 0.4588), //red
-    color2: new THREE.Vector3(0.8667, 0.7686, 0.4392), //green
+    backgroundColor: new THREE.Vector4(0.9, 0.1, 0.25, 0.3), 
+    color1: new THREE.Color(0x00ff00), // green
+    color2: new THREE.Color(0x0000ff), //blue
   },
 ];
 
@@ -164,9 +162,16 @@ const shapeOptions = {
 const updateColorInShader = (colorOptions) => {
   deviceDisplayPlaneMaterial.uniforms.u_backgroundColor.value =
     colorOptions.backgroundColor;
-  deviceDisplayPlaneMaterial.uniforms.u_color1.value = colorOptions.color1; 
-  deviceDisplayPlaneMaterial.uniforms.u_color2.value = colorOptions.color2;
-
+  deviceDisplayPlaneMaterial.uniforms.u_color1.value = new THREE.Vector3(
+    colorOptions.color1.r,
+    colorOptions.color1.g,
+    colorOptions.color1.b
+  );
+  deviceDisplayPlaneMaterial.uniforms.u_color2.value = new THREE.Vector3(
+    colorOptions.color2.r,
+    colorOptions.color2.g,
+    colorOptions.color2.b
+  );
 };
 
  const updateShapeInShader = (shapeOptions) => {
