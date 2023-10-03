@@ -125,11 +125,27 @@ loader.load(
       } else {
         child.material = material; //child of material, is same as material
       }
-      
-      //CONTINUE 
+
+      //CONTINUE
       console.log('isMesh:', child.isMesh);
       if (child.isMesh) {
         switch (child.name) {
+          case 'btn1001':
+            console.log('btn1001');
+            clickableBlenderObjects.push(child);
+            break;
+          case 'btn2001':
+            console.log('btn2');
+            clickableBlenderObjects.push(child);
+            break;
+          case 'btn3001':
+            console.log('btn301');
+            clickableBlenderObjects.push(child);
+            break;
+          case 'btn4001':
+            console.log('btn401');
+            clickableBlenderObjects.push(child);
+            break;
         } //switch case for each mesh - btns to click on > push to array clickableBlenderObjects
       }
     });
@@ -272,7 +288,7 @@ let intersectedObjects = []; // Array of objects that intersect with the raycast
 const hoverButton = () => {
   //make transparent
   raycaster.setFromCamera(mousePointer, camera); //get raycaster to know where the mouse is pointing
-  const intersects = raycaster.intersectObjects(clickableBlenderObjects) //-> the 3d obj I choose     //(scene.children, true); //get all the objects that intersects with the raycaster
+  const intersects = raycaster.intersectObjects(clickableBlenderObjects); //-> the 3d obj I choose     //(scene.children, true); //get all the objects that intersects with the raycaster
   //loop the intersects
 
   // Reset all previously intersected objects
@@ -292,29 +308,34 @@ const hoverButton = () => {
   console.log(intersectedObjects);
 };
 
-
 const clickButton = (event) => {
   raycaster.setFromCamera(mousePointer, camera); //get raycaster to know where the mouse is pointing
-  const intersects = raycaster.intersectObjects(clickableItems); //get all the objects that intersects with the raycaster
+  const intersects = raycaster.intersectObjects(clickableBlenderObjects); //I get all the objects that intersects with the raycaster
 
-  if (intersects.length > 0){
+  if (intersects.length > 0) {
     const object = intersects[0].object;
     /* if(object.name === ''){
       console.log('Clicked on button');
     } */
     switch (object.name) {
-      case 'NAME':
-        console.log('Clicked on button');
+      case 'btn1001':
+        console.log('Clicked on button 1');
         break;
-      case 'NAME':
-        console.log('Clicked on button');
+      case 'btn2001':
+        console.log('Clicked on button 2');
+        break;
+      case 'btn3001':
+        console.log('Clicked on button 3');
+        break;
+      case 'btn4001':
+        console.log('Clicked on button 4');
         break;
       default:
         console.log(' default - Clicked on button');
         break;
     }
-  };
-}
+  }
+};
 
 $canvas.addEventListener('click', clickButton);
 
