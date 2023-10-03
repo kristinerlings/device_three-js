@@ -17,7 +17,7 @@ scene.background = textureLoader.load('path/to/your/texture.jpg'); */
 
 // ========   FLOOR   ======== //
 
-const floorGeometry = new THREE.PlaneGeometry(20, 20, 10, 10); //create a plane
+const floorGeometry = new THREE.PlaneGeometry(20, 20, 10, 10); //create a plane - use buffer?
 const floorMaterial = new THREE.MeshBasicMaterial({
   color: '#242B32',
   side: THREE.DoubleSide,
@@ -72,7 +72,7 @@ orbitControls.enableDamping = true;
 const renderer = new THREE.WebGLRenderer({
   canvas: $canvas,
   //alpha: true,
-  antialias: true, //smooth edges?
+  antialias: true, 
 });
 //renderer.shadowMap.enabled = true;
 
@@ -320,6 +320,11 @@ const clickButton = (event) => {
     switch (object.name) {
       case 'btn1001':
         console.log('Clicked on button 1');
+        //object.material.color.set(colors.green);
+        object.position.x = 0.1;
+        setTimeout(() => {
+          object.position.x += 0.1;
+        }, 400);
         break;
       case 'btn2001':
         console.log('Clicked on button 2');
