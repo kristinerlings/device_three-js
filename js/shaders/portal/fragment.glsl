@@ -11,7 +11,7 @@
 //uniform samplerXX iChannel0..3;          // input channel. XX = 2D/Cube
 //uniform vec4      iDate;                 // (year, month, day, time in seconds)
 
-
+//IDEAS FOR INTERACTION
 //1. (VALUES IN RM function : values to change: d=map(p)*.9 distance, + adjust size of shape.)
 //2. Color values background (+alpha)
 
@@ -21,7 +21,7 @@ uniform int u_shapeMapIncrementNr;
 uniform vec4 u_backgroundColor;
 uniform vec3 u_color1;
 uniform vec3 u_color2;
-uniform float u_distance; 
+//uniform float u_distance; 
 
 //uniform vec2 iMouse;
 //uniform float touchEffect;
@@ -32,14 +32,13 @@ uniform vec2 iResolution;
 precision mediump float; //indicate medium precision for float - to work on e.g. mobile devices 
 
 
-varying vec2 vUv; //varying = input to the fragment shader from the vertex shader
+varying vec2 vUv; //varying = input to the fragment shader from the vertex shader. uVu - uv coordinates of the current pixel from the vertex shader
 
 
 // green:rgb(221,196,112) + yellow: (221,196,112)  /255 each for floating point nr.
 vec3 palette(float d){
     return mix(u_color1, u_color2, d);
     //return mix(vec3(0.4235, 0.5843, 0.4588),vec3(0.8667, 0.7686, 0.4392), d);
-	
     //return mix(vec3(0.2,0.7,0.9),vec3(1.,0.,1.),d);
 }
 
@@ -113,7 +112,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     
     //fragColor = col;
 
-    // Check the distance, if it's beyond a threshold, set background 
+    // Check the distance, if it's beyond a threshold, set background::
     if(col.a > 0.2) {
         fragColor = col; // Set the fragment color as calculated
     } else {

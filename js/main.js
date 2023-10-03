@@ -12,15 +12,18 @@ scene.add(new THREE.AxesHelper(2)); //remember to comment out
 
 scene.background = new THREE.Color('#89A4BF'); //('#d9b99b')
 
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
+scene.add(ambientLight);
+
 /* const textureLoader = new THREE.TextureLoader();
 scene.background = textureLoader.load('path/to/your/texture.jpg'); */
 
 // ========   FLOOR   ======== //
 
 const floorGeometry = new THREE.PlaneGeometry(20, 20, 10, 10); //create a plane - use buffer?
-const floorMaterial = new THREE.MeshBasicMaterial({
-  color: '#242B32',
-  side: THREE.DoubleSide,
+const floorMaterial = new THREE.MeshStandardMaterial({
+  color: '#43515e', //'#242B32',
+  side: THREE.DoubleSide, //render both sides of the faces
   //wireframe: true,
 }); //create a material
 /* const floorTexture = new THREE.TextureLoader().load('assets/floor.jpg'); //load texture */
@@ -35,17 +38,16 @@ const radius = 0.5;
 scene.add(floorMesh); //add the floor to the scene
 
 // ========   LIGHT   ======== //
-const light = new THREE.SpotLight();
-light.position.set(5, 5, 5);
+const light = new THREE.SpotLight('#2e3033', 1000);
+light.position.set(7, 8, -1.5);
+light.castShadow = true;
+/* light.shadow.mapSize.width = 1024;
+light.shadow.mapSize.height = 1024;
+light.shadow.camera.near = 0.1;
+light.shadow.camera.far = 100; */
 scene.add(light);
 
-/* const light = new THREE.SpotLight(0xffffff, 1000);
-light.position.set(12.5, 12.5, 12.5);
-light.castShadow = true;
-light.shadow.mapSize.width = 1024;
-light.shadow.mapSize.height = 1024;
-scene.add(light); */
-
+// ========   RAYCASTER   ======== //
 //https://threejs.org/docs/#api/en/core/Raycaster
 const raycaster = new THREE.Raycaster();
 const mousePointer = new THREE.Vector2();
@@ -74,7 +76,7 @@ const renderer = new THREE.WebGLRenderer({
   //alpha: true,
   antialias: true, 
 });
-//renderer.shadowMap.enabled = true;
+renderer.shadowMap.enabled = true;
 
 //set size of renderer to size object at top.
 renderer.setSize(size.width, size.height);
@@ -118,6 +120,10 @@ loader.load(
     console.log('gltf:', gltf);
     //loop through each of the children (assign the model to all of the children):
     gltf.scene.traverse((child) => {
+      if(child.name === 'device001'){
+        child.castShadow = true;
+       
+      }
       console.log('traverse, blender child name:', child.name);
       if (child.name === 'screenShader001') {
         //display shaderToy on device screen
@@ -320,6 +326,7 @@ const clickButton = (event) => {
     switch (object.name) {
       case 'btn1001':
         console.log('Clicked on button 1');
+        updateColorInShader(colorOptions[0]);
         //object.material.color.set(colors.green);
         object.position.x = 0.1;
         setTimeout(() => {
@@ -328,12 +335,27 @@ const clickButton = (event) => {
         break;
       case 'btn2001':
         console.log('Clicked on button 2');
+        updateColorInShader(colorOptions[1]);
+        object.position.x = 0.1;
+        setTimeout(() => {
+          object.position.x += 0.1;
+        }, 400);
         break;
       case 'btn3001':
+        updateColorInShader(colorOptions[2]);
         console.log('Clicked on button 3');
+        object.position.x = 0.1;
+        setTimeout(() => {
+          object.position.x += 0.1;
+        }, 400);
         break;
       case 'btn4001':
+        updateColorInShader(colorOptions[3]);
         console.log('Clicked on button 4');
+        object.position.x = 0.1;
+        setTimeout(() => {
+          object.position.x += 0.1;
+        }, 400);
         break;
       default:
         console.log(' default - Clicked on button');
@@ -376,6 +398,8 @@ window.addEventListener('resize', () => {
   // Update renderer
   renderer.setSize(size.width, size.height);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+
 
   //update iResolution in my shader
   deviceDisplayPlaneMaterial.uniforms.iResolution.value.set(
