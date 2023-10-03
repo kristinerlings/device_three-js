@@ -74,7 +74,7 @@ orbitControls.enableDamping = true;
 const renderer = new THREE.WebGLRenderer({
   canvas: $canvas,
   //alpha: true,
-  antialias: true, 
+  antialias: true,
 });
 renderer.shadowMap.enabled = true;
 
@@ -120,9 +120,8 @@ loader.load(
     console.log('gltf:', gltf);
     //loop through each of the children (assign the model to all of the children):
     gltf.scene.traverse((child) => {
-      if(child.name === 'device001'){
+      if (child.name === 'device001') {
         child.castShadow = true;
-       
       }
       console.log('traverse, blender child name:', child.name);
       if (child.name === 'screenShader001') {
@@ -243,8 +242,6 @@ const colorOptions = [
   },
 ];
 
-
-
 // update color in shader
 const updateColorInShader = (colorOptions) => {
   deviceDisplayPlaneMaterial.uniforms.u_backgroundColor.value =
@@ -363,8 +360,8 @@ const clickButton = (event) => {
         break;
       case 'btnCross001':
         console.log('Clicked on button cross');
-        // Translate to local space of the button
-        object.worldToLocal(point);
+
+        object.worldToLocal(point); //translate the point to local space of the button - can now check if the point is on the left, right, top or bottom of the button
 
         const left = point.z > 0 && Math.abs(point.x) < Math.abs(point.z); //did .y first but that didn't work. noticed in console that it was z that changed, not y. Is the blue helperline the z axis?
         const right = point.z < 0 && Math.abs(point.x) < Math.abs(point.z);
@@ -373,22 +370,38 @@ const clickButton = (event) => {
 
         if (object.name === 'btnCross001') {
           if (left) {
-            console.log('point',point)
+            console.log('point', point);
             console.log('LEFT');
-           
+
+            object.rotation.y -= 0.1; //rotate left
+            setTimeout(() => {
+              object.rotation.y += 0.1;
+            }, setTime);
+            updateShapeInShader({ incrementNr: 5 });
           } else if (right) {
             console.log('RIGHT');
-            
+            object.rotation.y += 0.1; //rotate right
+            setTimeout(() => {
+              object.rotation.y -= 0.1;
+            }, setTime);
+            updateShapeInShader({ incrementNr: 55 });
           } else if (bottom) {
             console.log('BOTTOM');
-             updateShapeInShader({ incrementNr: 8 });
-            
+            updateShapeInShader({ incrementNr: 8 });
+            object.rotation.z -= 0.1; //rotate down
+            setTimeout(() => {
+              object.rotation.z += 0.1;
+            }, setTime);
           } else if (top) {
             console.log('TOP');
             updateShapeInShader({ incrementNr: 20 });
-            console.log(updateShapeInShader)
+            console.log(updateShapeInShader);
+            object.rotation.z += 0.1; //rotate left
+            setTimeout(() => {
+              object.rotation.z -= 0.1;
+            }, setTime);
+
             //console.log(updateColorInShader(shapeOptions.incrementNr2));
-            
           }
         }
         //updateShapeInShader(shapeOptions.increment);
@@ -438,8 +451,6 @@ window.addEventListener('resize', () => {
   // Update renderer
   renderer.setSize(size.width, size.height);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-
 
   //update iResolution in my shader
   deviceDisplayPlaneMaterial.uniforms.iResolution.value.set(

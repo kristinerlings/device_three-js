@@ -112,7 +112,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     
     //fragColor = col;
 
-    // Check the distance, if it's beyond a threshold, set background::
+    // Check the distance, if it's beyond a threshold, set background:: access alpha col.a
     if(col.a > 0.2) {
         fragColor = col; // Set the fragment color as calculated
     } else {
