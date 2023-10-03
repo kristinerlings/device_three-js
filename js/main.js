@@ -243,10 +243,7 @@ const colorOptions = [
   },
 ];
 
-const shapeOptions = {
-  default: { incrementNr: 8 },
-  increment: { incrementNr: 20 },
-};
+
 
 // update color in shader
 const updateColorInShader = (colorOptions) => {
@@ -378,16 +375,20 @@ const clickButton = (event) => {
           if (left) {
             console.log('point',point)
             console.log('LEFT');
-            // execute top part action
+           
           } else if (right) {
             console.log('RIGHT');
-            // execute bottom part action
+            
           } else if (bottom) {
             console.log('BOTTOM');
-            // execute right part action
+             updateShapeInShader({ incrementNr: 8 });
+            
           } else if (top) {
             console.log('TOP');
-            // execute left part action
+            updateShapeInShader({ incrementNr: 20 });
+            console.log(updateShapeInShader)
+            //console.log(updateColorInShader(shapeOptions.incrementNr2));
+            
           }
         }
         //updateShapeInShader(shapeOptions.increment);
