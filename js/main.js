@@ -152,6 +152,10 @@ loader.load(
             console.log('btn401');
             clickableBlenderObjects.push(child);
             break;
+          case 'btnCross001':
+            console.log('btnCross001');
+            clickableBlenderObjects.push(child);
+            break;
         } //switch case for each mesh - btns to click on > push to array clickableBlenderObjects
       }
     });
@@ -189,7 +193,7 @@ const clock = new THREE.Clock();
 //Draw loop that executes the renderer
 const initDraw = () => {
   //decrease touch effect over time
-  deviceDisplayPlaneMaterial.uniforms.touchEffect.value *= 1.0;
+  //deviceDisplayPlaneMaterial.uniforms.touchEffect.value *= 1.0;
 
   //update time
   const timePassed = clock.getElapsedTime(); //get time passed since clock started - returns seconds passed and updates iTime
@@ -271,14 +275,14 @@ const updateShapeInShader = (shapeOptions) => {
   console.log(colorOptions[1]);
   console.log('red');
 }); */
-const $btnColors = document.querySelectorAll('.btn__color');
+/* const $btnColors = document.querySelectorAll('.btn__color');
 $btnColors.forEach((btn) => {
   btn.addEventListener('click', () => {
     const color = btn.dataset.color;
     updateColorInShader(colorOptions[color]);
     console.log(color);
   });
-});
+}); */
 
 const $btnShapes = document.querySelectorAll('.btn__shape');
 $btnShapes.forEach((btn) => {
@@ -320,9 +324,12 @@ const clickButton = (event) => {
 
   if (intersects.length > 0) {
     const object = intersects[0].object;
+    const point = intersects[0].point; // Intersection point in world coordinates + button
     /* if(object.name === ''){
       console.log('Clicked on button');
     } */
+    const setTime = 300;
+
     switch (object.name) {
       case 'btn1001':
         console.log('Clicked on button 1');
@@ -331,7 +338,7 @@ const clickButton = (event) => {
         object.position.x = 0.1;
         setTimeout(() => {
           object.position.x += 0.1;
-        }, 400);
+        }, setTime);
         break;
       case 'btn2001':
         console.log('Clicked on button 2');
@@ -339,7 +346,7 @@ const clickButton = (event) => {
         object.position.x = 0.1;
         setTimeout(() => {
           object.position.x += 0.1;
-        }, 400);
+        }, setTime);
         break;
       case 'btn3001':
         updateColorInShader(colorOptions[2]);
@@ -347,7 +354,7 @@ const clickButton = (event) => {
         object.position.x = 0.1;
         setTimeout(() => {
           object.position.x += 0.1;
-        }, 400);
+        }, setTime);
         break;
       case 'btn4001':
         updateColorInShader(colorOptions[3]);
@@ -355,7 +362,39 @@ const clickButton = (event) => {
         object.position.x = 0.1;
         setTimeout(() => {
           object.position.x += 0.1;
-        }, 400);
+        }, setTime);
+        break;
+      case 'btnCross001':
+        console.log('Clicked on button cross');
+        // Translate to local space of the button
+        object.worldToLocal(point);
+
+        const left = point.z > 0 && Math.abs(point.x) < Math.abs(point.z); //did .y first but that didn't work. noticed in console that it was z that changed, not y. Is the blue helperline the z axis?
+        const right = point.z < 0 && Math.abs(point.x) < Math.abs(point.z);
+        const top = point.x < 0 && Math.abs(point.y) < Math.abs(point.x);
+        const bottom = point.x > 0 && Math.abs(point.y) < Math.abs(point.x);
+
+        if (object.name === 'btnCross001') {
+          if (left) {
+            console.log('point',point)
+            console.log('LEFT');
+            // execute top part action
+          } else if (right) {
+            console.log('RIGHT');
+            // execute bottom part action
+          } else if (bottom) {
+            console.log('BOTTOM');
+            // execute right part action
+          } else if (top) {
+            console.log('TOP');
+            // execute left part action
+          }
+        }
+        //updateShapeInShader(shapeOptions.increment);
+        /* object.position.x = 0.1;
+        setTimeout(() => {
+          object.position.x += 0.1;
+        }, setTime); */
         break;
       default:
         console.log(' default - Clicked on button');
