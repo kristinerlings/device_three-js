@@ -83,13 +83,11 @@ renderer.setSize(size.width, size.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
 // ========   BAKED   ======== //
-const textureBlender = new THREE.TextureLoader().load(
-  'assets/bakedTesting.jpg'
-);
+const textureBlender = new THREE.TextureLoader().load('assets/baked3.jpg');
 textureBlender.flipY = false; //y axis of textures I load is inverted. This is boolean... not -1
 const material = new THREE.MeshBasicMaterial({ map: textureBlender });
 
-//CHECK documentation: shader material
+
 //uniforms: pass data from js to shader (vertex and fragment)
 // ========   PORTAL/Screen-device   ======== //
 const deviceDisplayPlaneMaterial = new THREE.ShaderMaterial({
@@ -155,7 +153,7 @@ loader.load(
             console.log('btnCross001');
             clickableBlenderObjects.push(child);
             break;
-        } //switch case for each mesh - btns to click on > push to array clickableBlenderObjects
+        } 
       }
     });
     scene.add(gltf.scene);

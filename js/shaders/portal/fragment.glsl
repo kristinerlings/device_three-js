@@ -125,8 +125,7 @@ void main()
   vec2 fragCoord = iResolution * vUv;
   gl_FragColor = vec4(u_backgroundColor.xyz, u_backgroundColor.w);
   mainImage(gl_FragColor, fragCoord);
-
- //mouse move interaction
+  //mouse move interaction
  // float distanceFromMouse = distance(iMouse, fragCoord);
  // float colorEffect = max(0.0, 1.0 - distanceFromMouse / 30.0 * touchEffect);
   //gl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(1.0), colorEffect);
