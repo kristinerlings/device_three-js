@@ -81,20 +81,23 @@ renderer.shadowMap.enabled = true;
 renderer.setSize(size.width, size.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-// ======== AUDIO ======= //
+// ======== AUDIO ======= // 1. audio listener -> camera. 2. audio position -> 3dmodel/device
 // create an AudioListener and add it to the camera
 const listener = new THREE.AudioListener();
 camera.add(listener);
 
 // create a global audio source
-const sound = new THREE.Audio(listener);
+//const sound = new THREE.Audio(listener);
+// create the PositionalAudio object (passing in the listener)
+const sound = new THREE.PositionalAudio(listener);
 
 // load a sound and set it as the Audio object's buffer
 const audioLoader = new THREE.AudioLoader();
 audioLoader.load('/assets/8bit-sample-69080.mp3', function (buffer) {
   sound.setBuffer(buffer);
   sound.setLoop(true);
-  sound.setVolume(0.5); //maybe change later depending on camera distance?
+  //sound.setVolume(0.5); //maybe change later depending on camera distance?
+  sound.setRefDistance(20);
 });
 console.log('audioLoader', audioLoader);
 
@@ -224,7 +227,7 @@ loader.load(
     //position scene it lower:
     gltf.scene.position.y = -1.5;
     gltf.scene.castShadow = true; //get this to work with light source later.  -need to pick the device?
-
+    gltf.add(sound); // add sound to device :))))
     // gltf.animations; // Array<THREE.AnimationClip>
     // gltf.scene; // THREE.Group
     // gltf.scenes; // Array<THREE.Group>
