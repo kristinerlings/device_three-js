@@ -19,7 +19,6 @@ scene.add(ambientLight);
 scene.background = textureLoader.load('path/to/your/texture.jpg'); */
 
 // ========   FLOOR   ======== //
-
 const floorGeometry = new THREE.BoxGeometry(5, 20, 1); //new THREE.PlaneGeometry(5, 10); //create a plane - use buffer?
 const floorMaterial = new THREE.MeshStandardMaterial({
   color: '#43515e', //'#242B32',
@@ -82,6 +81,25 @@ renderer.shadowMap.enabled = true;
 renderer.setSize(size.width, size.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
+// ======== AUDIO ======= //
+// create an AudioListener and add it to the camera
+const listener = new THREE.AudioListener();
+camera.add(listener);
+
+// create a global audio source
+const sound = new THREE.Audio(listener);
+
+// load a sound and set it as the Audio object's buffer
+const audioLoader = new THREE.AudioLoader();
+audioLoader.load('/assets/8bit-sample-69080.mp3', function (buffer) {
+  sound.setBuffer(buffer);
+  sound.setLoop(true);
+  sound.setVolume(0.5); //maybe change later depending on camera distance?
+});
+console.log('audioLoader', audioLoader);
+
+let isAudioPlaying = false;
+
 // ========   BAKED   ======== //
 const colorDevice = {
   red: '#D13F2E',
@@ -137,7 +155,6 @@ loader.load(
         child.material = material; //child of material, is same as material
       }
 
-  
       console.log('isMesh:', child.isMesh);
       if (child.isMesh) {
         switch (child.name) {
@@ -183,16 +200,19 @@ loader.load(
             });
             break;
           case 'btnOFF001':
+            clickableBlenderObjects.push(child);
             child.material = new THREE.MeshBasicMaterial({
               color: colorDevice.dark,
             });
             break;
           case 'btnSmall1001':
+            clickableBlenderObjects.push(child);
             child.material = new THREE.MeshBasicMaterial({
               color: colorDevice.dark,
             });
             break;
           case 'btnSmall2001':
+            clickableBlenderObjects.push(child);
             child.material = new THREE.MeshBasicMaterial({
               color: colorDevice.dark,
             });
@@ -329,24 +349,6 @@ $btnShapes.forEach((btn) => {
   });
 });
 
-// ======== AUDIO ======= //
-// create an AudioListener and add it to the camera
-const listener = new THREE.AudioListener();
-camera.add(listener);
-
-// create a global audio source
-const sound = new THREE.Audio(listener);
-
-// load a sound and set it as the Audio object's buffer
-const audioLoader = new THREE.AudioLoader();
-audioLoader.load('/assets/8bit-sample-69080.mp3', function (buffer) {
-  sound.setBuffer(buffer);
-  sound.setLoop(false);
-  sound.setVolume(0.5);
-  sound.play();
-});
-console.log('audioLoader', audioLoader);
-
 // ========   Mouse click   ======== //
 let intersectedObjects = []; // Array of objects that intersect with the raycaster
 const hoverButton = () => {
@@ -385,37 +387,53 @@ const clickButton = (event) => {
     const setTime = 300;
 
     switch (object.name) {
+      case 'btnOFF001':
+        console.log('Clicked on button 1');
+        updateColorInShader(colorOptions[0]);
+        //object.material.color.set(colors.green);
+        if (!isAudioPlaying) {
+          sound.play();
+          isAudioPlaying = true;
+        } else {
+          sound.pause();
+          isAudioPlaying = false;
+        }
+        object.position.x -= 0.03;
+        setTimeout(() => {
+          object.position.x += 0.03;
+        }, 300);
+        break;
       case 'btn1001':
         console.log('Clicked on button 1');
         updateColorInShader(colorOptions[0]);
         //object.material.color.set(colors.green);
-        object.position.x = 0.1;
+        object.position.x -= 0.06;
         setTimeout(() => {
-          object.position.x += 0.1;
+          object.position.x += 0.06;
         }, setTime);
         break;
       case 'btn2001':
         console.log('Clicked on button 2');
         updateColorInShader(colorOptions[1]);
-        object.position.x = 0.1;
+        object.position.x -= 0.06;
         setTimeout(() => {
-          object.position.x += 0.1;
+          object.position.x += 0.06;
         }, setTime);
         break;
       case 'btn3001':
         updateColorInShader(colorOptions[2]);
         console.log('Clicked on button 3');
-        object.position.x = 0.1;
+        object.position.x -= 0.06;
         setTimeout(() => {
-          object.position.x += 0.1;
+          object.position.x += 0.06;
         }, setTime);
         break;
       case 'btn4001':
         updateColorInShader(colorOptions[3]);
         console.log('Clicked on button 4');
-        object.position.x = 0.1;
+        object.position.x -= 0.06;
         setTimeout(() => {
-          object.position.x += 0.1;
+          object.position.x += 0.06;
         }, setTime);
         break;
       case 'btnCross001':
