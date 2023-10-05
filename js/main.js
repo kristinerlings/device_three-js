@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 //import { GLTFLoader } from 'three/addons/GLTFLoader.js'; // I get network error if I use this one
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'; //use this until I ask the teacher
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'; //use this until I ask the teacher : https://discourse.threejs.org/t/gltfloader-cannot-be-found/42254/4
 
 import portalVertexShader from './shaders/portal/vertex.glsl?raw'; //vite doesn't know about gls. Will get an error so: Will add ? and specify raw (tell it's just a string)
 import portalFragmentShader from './shaders/portal/fragment.glsl?raw';
@@ -89,10 +89,9 @@ const colorDevice = {
 };
 const textureBlender = new THREE.TextureLoader().load('assets/baked3.jpg');
 textureBlender.flipY = false; //y axis of textures I load is inverted. This is boolean... not -1
-const material =  new THREE.MeshBasicMaterial({
+const material = new THREE.MeshBasicMaterial({
   color: colorDevice.red,
 });
-
 
 //uniforms: pass data from js to shader (vertex and fragment)
 // ========   PORTAL/Screen-device   ======== //
@@ -118,7 +117,7 @@ let clickableBlenderObjects = [];
 // Load a glTF resource
 loader.load(
   // resource URL
-  'assets/gameDeviceFour.glb',
+  '/assets/gameDeviceFour.glb',
   // called when the resource is loaded
   (gltf) => {
     console.log('gltf:', gltf);
@@ -138,7 +137,7 @@ loader.load(
         child.material = material; //child of material, is same as material
       }
 
-      //CONTINUE
+  
       console.log('isMesh:', child.isMesh);
       if (child.isMesh) {
         switch (child.name) {
@@ -179,6 +178,21 @@ loader.load(
             });
             break;
           case 'device-dark001':
+            child.material = new THREE.MeshBasicMaterial({
+              color: colorDevice.dark,
+            });
+            break;
+          case 'btnOFF001':
+            child.material = new THREE.MeshBasicMaterial({
+              color: colorDevice.dark,
+            });
+            break;
+          case 'btnSmall1001':
+            child.material = new THREE.MeshBasicMaterial({
+              color: colorDevice.dark,
+            });
+            break;
+          case 'btnSmall2001':
             child.material = new THREE.MeshBasicMaterial({
               color: colorDevice.dark,
             });
@@ -314,6 +328,24 @@ $btnShapes.forEach((btn) => {
     console.log(shape);
   });
 });
+
+// ======== AUDIO ======= //
+// create an AudioListener and add it to the camera
+const listener = new THREE.AudioListener();
+camera.add(listener);
+
+// create a global audio source
+const sound = new THREE.Audio(listener);
+
+// load a sound and set it as the Audio object's buffer
+const audioLoader = new THREE.AudioLoader();
+audioLoader.load('/assets/8bit-sample-69080.mp3', function (buffer) {
+  sound.setBuffer(buffer);
+  sound.setLoop(false);
+  sound.setVolume(0.5);
+  sound.play();
+});
+console.log('audioLoader', audioLoader);
 
 // ========   Mouse click   ======== //
 let intersectedObjects = []; // Array of objects that intersect with the raycaster
