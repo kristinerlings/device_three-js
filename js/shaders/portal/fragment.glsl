@@ -123,7 +123,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
 void main()
 {
   vec2 fragCoord = iResolution * vUv;
-  gl_FragColor = vec4(u_backgroundColor.xyz, u_backgroundColor.w);
+  //gl_FragColor = vec4(u_backgroundColor.xyz, u_backgroundColor.w);
   mainImage(gl_FragColor, fragCoord);
   //mouse move interaction
  // float distanceFromMouse = distance(iMouse, fragCoord);

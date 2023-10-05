@@ -20,7 +20,7 @@ scene.background = textureLoader.load('path/to/your/texture.jpg'); */
 
 // ========   FLOOR   ======== //
 
-const floorGeometry = new THREE.PlaneGeometry(20, 20, 10, 10); //create a plane - use buffer?
+const floorGeometry = new THREE.BoxGeometry(5, 20, 1); //new THREE.PlaneGeometry(5, 10); //create a plane - use buffer?
 const floorMaterial = new THREE.MeshStandardMaterial({
   color: '#43515e', //'#242B32',
   side: THREE.DoubleSide, //render both sides of the faces
@@ -31,7 +31,7 @@ const floorMaterial = new THREE.MeshStandardMaterial({
 const floorMesh = new THREE.Mesh(floorGeometry, floorMaterial); //create a mesh
 floorMesh.receiveShadow = true; //receive shadows
 floorMesh.rotation.x = Math.PI * -0.5; //rotate the floor 90 degrees
-floorMesh.position.y = -2; //move the floor down
+floorMesh.position.y = -2.5; //move the floor down
 //round corners
 const radius = 0.5;
 
@@ -83,9 +83,15 @@ renderer.setSize(size.width, size.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
 // ========   BAKED   ======== //
+const colorDevice = {
+  red: '#D13F2E',
+  dark: '#140006',
+};
 const textureBlender = new THREE.TextureLoader().load('assets/baked3.jpg');
 textureBlender.flipY = false; //y axis of textures I load is inverted. This is boolean... not -1
-const material = new THREE.MeshBasicMaterial({ map: textureBlender });
+const material =  new THREE.MeshBasicMaterial({
+  color: colorDevice.red,
+});
 
 
 //uniforms: pass data from js to shader (vertex and fragment)
@@ -119,6 +125,9 @@ loader.load(
     //loop through each of the children (assign the model to all of the children):
     gltf.scene.traverse((child) => {
       if (child.name === 'device001') {
+        child.material = new THREE.MeshBasicMaterial({
+          color: colorDevice.dark,
+        });
         child.castShadow = true;
       }
       console.log('traverse, blender child name:', child.name);
@@ -136,24 +145,45 @@ loader.load(
           case 'btn1001':
             console.log('btn1001');
             clickableBlenderObjects.push(child);
+            //child.material.color.set(colorDevice.red);
+            child.material = new THREE.MeshBasicMaterial({
+              color: colorDevice.dark,
+            });
             break;
           case 'btn2001':
             console.log('btn2');
             clickableBlenderObjects.push(child);
+            child.material = new THREE.MeshBasicMaterial({
+              color: colorDevice.dark,
+            });
             break;
           case 'btn3001':
             console.log('btn301');
             clickableBlenderObjects.push(child);
+            child.material = new THREE.MeshBasicMaterial({
+              color: colorDevice.dark,
+            });
             break;
           case 'btn4001':
             console.log('btn401');
             clickableBlenderObjects.push(child);
+            child.material = new THREE.MeshBasicMaterial({
+              color: colorDevice.dark,
+            });
             break;
           case 'btnCross001':
             console.log('btnCross001');
             clickableBlenderObjects.push(child);
+            child.material = new THREE.MeshBasicMaterial({
+              color: colorDevice.dark,
+            });
             break;
-        } 
+          case 'device-dark001':
+            child.material = new THREE.MeshBasicMaterial({
+              color: colorDevice.dark,
+            });
+            break;
+        }
       }
     });
     scene.add(gltf.scene);
