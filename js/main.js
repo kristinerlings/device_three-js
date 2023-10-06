@@ -35,19 +35,6 @@ const radius = 0.5;
 
 scene.add(floorMesh); //add the floor to the scene
 
-// ========   LIGHT   ======== //
-const light = new THREE.DirectionalLight('#2e3033', 20); //new THREE.SpotLight('#2e3033', 1000);
-//THREE.DirectionalLightHelper(light);
-light.position.set(7, 8, -4.5);
-light.castShadow = true;
-/* light.shadow.mapSize.width = 1024;
-light.shadow.mapSize.height = 1024;
-light.shadow.camera.near = 0.1;
-light.shadow.camera.far = 100; */
-light.shadow.camera.near = 1;
-light.shadow.camera.far = 50;
-const lightHelper = new THREE.DirectionalLightHelper(light, 3);
-scene.add(light, lightHelper); //take out helper before submitting
 
 // ========   RAYCASTER   ======== //
 //https://threejs.org/docs/#api/en/core/Raycaster
@@ -83,6 +70,21 @@ renderer.shadowMap.enabled = true;
 //set size of renderer to size object at top.
 renderer.setSize(size.width, size.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+// ========   LIGHT   ======== //
+const light = new THREE.DirectionalLight('#2e3033', 15); //new THREE.SpotLight('#2e3033', 1000);
+//THREE.DirectionalLightHelper(light);
+light.position.set(8, 10, 8.5);
+light.castShadow = true;
+/* light.shadow.mapSize.width = 1024;
+light.shadow.mapSize.height = 1024;
+light.shadow.camera.near = 0.1;
+light.shadow.camera.far = 100; */
+light.shadow.camera.near = 1;
+light.shadow.camera.far = 50;
+const lightHelper = new THREE.DirectionalLightHelper(light, 3);
+camera.add(light, lightHelper); //take out helper before submitting
+
 
 // ======== AUDIO ======= // 1. audio listener -> camera. 2. audio position -> 3dmodel/device
 // create an AudioListener and add it to the camera
@@ -233,7 +235,8 @@ loader.load(
     scene.add(gltf.scene);
     //position scene it lower:
     gltf.scene.position.y = -1.5;
-    gltf.scene.castShadow = true; //get this to work with light source later.  -need to pick the device?
+    gltf.scene.castShadow = true; //get this to work with light source later. 
+    gltf.scene.receiveShadow = true;
     gltf.add(sound); // add sound to device :))))
     // gltf.animations; // Array<THREE.AnimationClip>
     // gltf.scene; // THREE.Group
@@ -379,6 +382,10 @@ const hoverButton = () => {
   for (let i = 0; i < intersects.length; i++) {
     if (intersects[i].object.name === 'btnOFF001') {
       intersects[i].object.material.color.set(colors.green);
+    } else if (intersects[i].object.name === 'btnCross001' ){
+      intersects[i].object.material.color.set(colors.orange);
+    } else if (intersects[i].object.name === 'btnSmall1001') {
+      intersects[i].object.material.color.set(colors.yellow);
     } else {
       intersects[i].object.material.color.set(colors.blue);
     }
