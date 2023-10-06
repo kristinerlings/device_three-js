@@ -14,14 +14,14 @@ scene.background = textureLoader.load('assets/7861.jpg');
 
 //scene.background = new THREE.Color('#89A4BF'); //('#d9b99b')
 
-//const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
-//scene.add(ambientLight);
+const ambientLight = new THREE.AmbientLight(0xffffff, 2);
+// scene.add(ambientLight);
 
 // ========   FLOOR   ======== //
-const floorGeometry = new THREE.BoxGeometry(5, 20, 1); //new THREE.PlaneGeometry(5, 10); //create a plane - use buffer?
+const floorGeometry = new THREE.PlaneGeometry(10, 10); //new THREE.PlaneGeometry(5, 10); //create a plane - use buffer?
 const floorMaterial = new THREE.MeshStandardMaterial({
-  color: '#43515e', //'#242B32',
-  side: THREE.DoubleSide, //render both sides of the faces
+  // color: '#43515e', //'#242B32',
+  color: '#ffffff',
   //wireframe: true,
 }); //create a material
 /* const floorTexture = new THREE.TextureLoader().load('assets/floor.jpg'); //load texture */
@@ -31,10 +31,8 @@ floorMesh.receiveShadow = true; //receive shadows
 floorMesh.rotation.x = Math.PI * -0.5; //rotate the floor 90 degrees
 floorMesh.position.y = -2.5; //move the floor down
 //round corners
-const radius = 0.5;
 
 scene.add(floorMesh); //add the floor to the scene
-
 
 // ========   RAYCASTER   ======== //
 //https://threejs.org/docs/#api/en/core/Raycaster
@@ -47,7 +45,7 @@ const size = {
 };
 
 const camera = new THREE.PerspectiveCamera(
-  40,
+  50,
   size.width / size.height,
   0.1,
   100
@@ -72,19 +70,17 @@ renderer.setSize(size.width, size.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
 // ========   LIGHT   ======== //
-const light = new THREE.DirectionalLight('#2e3033', 15); //new THREE.SpotLight('#2e3033', 1000);
-//THREE.DirectionalLightHelper(light);
+const light = new THREE.DirectionalLight('#ffffff', 3); //new THREE.SpotLight('#2e3033', 1000);
 light.position.set(8, 10, 8.5);
 light.castShadow = true;
 /* light.shadow.mapSize.width = 1024;
-light.shadow.mapSize.height = 1024;
-light.shadow.camera.near = 0.1;
-light.shadow.camera.far = 100; */
-light.shadow.camera.near = 1;
-light.shadow.camera.far = 50;
+light.shadow.mapSize.height = 1024; */
+// light.shadow.camera.near = 1;
+// light.shadow.camera.far = 50;
 const lightHelper = new THREE.DirectionalLightHelper(light, 3);
-camera.add(light, lightHelper); //take out helper before submitting
-
+scene.add(light, lightHelper); //take out helper before submitting
+const lightShadowHelper = new THREE.CameraHelper(light.shadow.camera);
+scene.add(lightShadowHelper);
 
 // ======== AUDIO ======= // 1. audio listener -> camera. 2. audio position -> 3dmodel/device
 // create an AudioListener and add it to the camera
@@ -113,11 +109,15 @@ const colorDevice = {
   red: '#D13F2E',
   dark: '#140006',
 };
-const textureBlender = new THREE.TextureLoader().load('assets/baked3.jpg');
-textureBlender.flipY = false; //y axis of textures I load is inverted. This is boolean... not -1
+//const textureBlender = new THREE.TextureLoader().load('assets/baked3.jpg');
+//textureBlender.flipY = false; //y axis of textures I load is inverted. This is boolean... not -1
 //THe meshBasicMaterial doesn't receive shadows/light??? MeshStandardMaterial -> does not work ?
-const material = new THREE.MeshBasicMaterial({
+/* const material = new THREE.MeshBasicMaterial({
   color: colorDevice.red,
+}); */
+const material = new THREE.MeshStandardMaterial({
+  color: 0xffffff,
+  emissive: colorDevice.red,
 });
 
 //uniforms: pass data from js to shader (vertex and fragment)
@@ -144,99 +144,103 @@ let clickableBlenderObjects = [];
 // Load a glTF resource
 loader.load(
   // resource URL
-  'assets/gameDeviceFive.glb',
+  'assets/gameDeviceThree.glb',
   // called when the resource is loaded
   (gltf) => {
     console.log('gltf:', gltf);
     //loop through each of the children (assign the model to all of the children):
     gltf.scene.traverse((child) => {
       if (child.name === 'device001') {
-        child.material = new THREE.MeshBasicMaterial({
-          color: colorDevice.dark,
-        });
-        child.castShadow = true;
-        child.receiveShadow = true;
+        // child.material = new THREE.MeshStandardMaterial({
+        //   color: colorDevice.red,
+        // });
+        // child.castShadow = true;
+        // child.receiveShadow = true;
       }
       console.log('traverse, blender child name:', child.name);
       if (child.name === 'screenShader001') {
         //display shaderToy on device screen
         child.material = deviceDisplayPlaneMaterial;
       } else {
-        child.material = material; //child of material, is same as material
+        // child.material = material; //child of material, is same as material
       }
 
-      console.log('isMesh:', child.isMesh);
+      console.log('isMesh:', child);
       if (child.isMesh) {
         child.castShadow = true;
         child.receiveShadow = true;
         switch (child.name) {
+          case 'device001':
+            /*      child.material = material;
+            child.receiveShadow = true; */
+            break;
           case 'btn1001':
             console.log('btn1001');
             clickableBlenderObjects.push(child);
             //child.material.color.set(colorDevice.red);
-            child.material = new THREE.MeshBasicMaterial({
+            child.material = new THREE.MeshStandardMaterial({
               color: colorDevice.dark,
             });
+            /* child.material.castShadow = true;
+            child.material.receiveShadow = true; */
             break;
           case 'btn2001':
             console.log('btn2');
             clickableBlenderObjects.push(child);
-            child.material = new THREE.MeshBasicMaterial({
+            child.material = new THREE.MeshStandardMaterial({
               color: colorDevice.dark,
             });
             break;
           case 'btn3001':
             console.log('btn301');
             clickableBlenderObjects.push(child);
-            child.material = new THREE.MeshBasicMaterial({
+            /*  child.material = new THREE.MeshStandardMaterial({
               color: colorDevice.dark,
-            });
+            }); */
             break;
           case 'btn4001':
             console.log('btn401');
             clickableBlenderObjects.push(child);
-            child.material = new THREE.MeshBasicMaterial({
+            /* child.material = new THREE.MeshStandardMaterial({
               color: colorDevice.dark,
-            });
+            }); */
             break;
           case 'btnCross001':
             console.log('btnCross001');
             clickableBlenderObjects.push(child);
-            child.material = new THREE.MeshBasicMaterial({
+            /*  child.material = new THREE.MeshStandardMaterial({
               color: colorDevice.dark,
-            });
+            }); */
             break;
           case 'device-dark001':
-            child.material = new THREE.MeshBasicMaterial({
+            /*  child.material = new THREE.MeshStandardMaterial({
               color: colorDevice.dark,
-            });
+            }); */
             break;
           case 'btnOFF001':
             clickableBlenderObjects.push(child);
-            child.material = new THREE.MeshBasicMaterial({
+            /*  child.material = new THREE.MeshStandardMaterial({
               color: colorDevice.dark,
-            });
+            }); */
             break;
           case 'btnSmall1001':
             clickableBlenderObjects.push(child);
-            child.material = new THREE.MeshBasicMaterial({
+            /*  child.material = new THREE.MeshStandardMaterial({
               color: colorDevice.dark,
-            });
+            }); */
             break;
           case 'btnSmall2001':
             clickableBlenderObjects.push(child);
-            child.material = new THREE.MeshBasicMaterial({
+            /*  child.material = new THREE.MeshStandardMaterial({
               color: colorDevice.dark,
-            });
+            }); */
             break;
         }
       }
     });
     scene.add(gltf.scene);
     //position scene it lower:
-    gltf.scene.position.y = -1.5;
-    gltf.scene.castShadow = true; //get this to work with light source later. 
-    gltf.scene.receiveShadow = true;
+    // gltf.scene.position.y = -1.5;
     gltf.add(sound); // add sound to device :))))
     // gltf.animations; // Array<THREE.AnimationClip>
     // gltf.scene; // THREE.Group
@@ -381,8 +385,10 @@ const hoverButton = () => {
   // Set color for currently intersected objects
   for (let i = 0; i < intersects.length; i++) {
     if (intersects[i].object.name === 'btnOFF001') {
-      intersects[i].object.material.color.set(colors.green);
-    } else if (intersects[i].object.name === 'btnCross001' ){
+      intersects[i].object.material = new THREE.MeshStandardMaterial({
+        color: colors.green,
+      }); ///color.set(colors.green);
+    } else if (intersects[i].object.name === 'btnCross001') {
       intersects[i].object.material.color.set(colors.orange);
     } else if (intersects[i].object.name === 'btnSmall1001') {
       intersects[i].object.material.color.set(colors.yellow);
@@ -392,7 +398,7 @@ const hoverButton = () => {
     /*     intersects[i].object.material.opacity = 0.5; */
     intersectedObjects.push(intersects[i].object); // Add to array for next frame
   }
-  console.log(intersectedObjects);
+  // console.log(intersectedObjects);
 };
 
 const clickButton = (event) => {
@@ -518,13 +524,7 @@ const clickButton = (event) => {
 
 $canvas.addEventListener('click', clickButton);
 
-// ========   Mouse move   ======== //
 
-/* $canvas.addEventListener('mousemove', (event) => {
-  deviceDisplayPlaneMaterial.uniforms.iMouse.value.x = event.clientX;
-  deviceDisplayPlaneMaterial.uniforms.iMouse.value.y = event.clientY;
-  deviceDisplayPlaneMaterial.uniforms.touchEffect.value = 1.0;
-}); */
 
 // ========   Raycasting  - store mouse coordinates  ======== //
 const onPointerMove = (event) => {
