@@ -9,14 +9,13 @@ import portalFragmentShader from './shaders/portal/fragment.glsl?raw';
 const $canvas = document.querySelector('.webglCanvas');
 const scene = new THREE.Scene();
 scene.add(new THREE.AxesHelper(2)); //remember to comment out
+const textureLoader = new THREE.TextureLoader();
+scene.background = textureLoader.load('assets/7861.jpg');
 
-scene.background = new THREE.Color('#89A4BF'); //('#d9b99b')
+//scene.background = new THREE.Color('#89A4BF'); //('#d9b99b')
 
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
-scene.add(ambientLight);
-
-/* const textureLoader = new THREE.TextureLoader();
-scene.background = textureLoader.load('path/to/your/texture.jpg'); */
+//const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
+//scene.add(ambientLight);
 
 // ========   FLOOR   ======== //
 const floorGeometry = new THREE.BoxGeometry(5, 20, 1); //new THREE.PlaneGeometry(5, 10); //create a plane - use buffer?
@@ -37,14 +36,18 @@ const radius = 0.5;
 scene.add(floorMesh); //add the floor to the scene
 
 // ========   LIGHT   ======== //
-const light = new THREE.SpotLight('#2e3033', 1000);
-light.position.set(7, 8, -1.5);
+const light = new THREE.DirectionalLight('#2e3033', 20); //new THREE.SpotLight('#2e3033', 1000);
+//THREE.DirectionalLightHelper(light);
+light.position.set(7, 8, -4.5);
 light.castShadow = true;
 /* light.shadow.mapSize.width = 1024;
 light.shadow.mapSize.height = 1024;
 light.shadow.camera.near = 0.1;
 light.shadow.camera.far = 100; */
-scene.add(light);
+light.shadow.camera.near = 1;
+light.shadow.camera.far = 50;
+const lightHelper = new THREE.DirectionalLightHelper(light, 3);
+scene.add(light, lightHelper); //take out helper before submitting
 
 // ========   RAYCASTER   ======== //
 //https://threejs.org/docs/#api/en/core/Raycaster
@@ -93,7 +96,7 @@ const sound = new THREE.PositionalAudio(listener);
 
 // load a sound and set it as the Audio object's buffer
 const audioLoader = new THREE.AudioLoader();
-audioLoader.load('/assets/8bit-sample-69080.mp3', function (buffer) {
+audioLoader.load('assets/8bit-sample-69080.mp3', function (buffer) {
   sound.setBuffer(buffer);
   sound.setLoop(true);
   //sound.setVolume(0.5); //maybe change later depending on camera distance?
@@ -110,6 +113,7 @@ const colorDevice = {
 };
 const textureBlender = new THREE.TextureLoader().load('assets/baked3.jpg');
 textureBlender.flipY = false; //y axis of textures I load is inverted. This is boolean... not -1
+//THe meshBasicMaterial doesn't receive shadows/light??? MeshStandardMaterial -> does not work ?
 const material = new THREE.MeshBasicMaterial({
   color: colorDevice.red,
 });
@@ -138,7 +142,7 @@ let clickableBlenderObjects = [];
 // Load a glTF resource
 loader.load(
   // resource URL
-  '/assets/gameDeviceFour.glb',
+  'assets/gameDeviceFive.glb',
   // called when the resource is loaded
   (gltf) => {
     console.log('gltf:', gltf);
@@ -149,6 +153,7 @@ loader.load(
           color: colorDevice.dark,
         });
         child.castShadow = true;
+        child.receiveShadow = true;
       }
       console.log('traverse, blender child name:', child.name);
       if (child.name === 'screenShader001') {
@@ -160,6 +165,8 @@ loader.load(
 
       console.log('isMesh:', child.isMesh);
       if (child.isMesh) {
+        child.castShadow = true;
+        child.receiveShadow = true;
         switch (child.name) {
           case 'btn1001':
             console.log('btn1001');
@@ -264,7 +271,7 @@ const initDraw = () => {
   deviceDisplayPlaneMaterial.uniforms.iTime.value = timePassed; //update iTime in my shader -
 
   // hover button
-  //hoverButton();
+  hoverButton();
 
   //
   renderer.render(scene, camera); //draw the scene
@@ -362,16 +369,20 @@ const hoverButton = () => {
 
   // Reset all previously intersected objects
   intersectedObjects.forEach((object) => {
-    object.material.transparent = false;
+    object.material.color.set(colorDevice.dark);
     object.material.opacity = 1;
   });
 
   intersectedObjects = []; // Clear the array
 
-  // Set transparency for currently intersected objects
+  // Set color for currently intersected objects
   for (let i = 0; i < intersects.length; i++) {
-    intersects[i].object.material.transparent = true;
-    intersects[i].object.material.opacity = 0.5;
+    if (intersects[i].object.name === 'btnOFF001') {
+      intersects[i].object.material.color.set(colors.green);
+    } else {
+      intersects[i].object.material.color.set(colors.blue);
+    }
+    /*     intersects[i].object.material.opacity = 0.5; */
     intersectedObjects.push(intersects[i].object); // Add to array for next frame
   }
   console.log(intersectedObjects);
