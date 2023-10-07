@@ -332,17 +332,10 @@ const clickButton = (event) => {
       setTimeout(() => {
         object.position.x += positionValue;
       }, setTime);
-     /*  object.position.x -= 0.06;
-      setTimeout(() => {
-        object.position.x += 0.06;
-      }, timeValue); */
     }
 
     switch (object.name) {
       case 'btnOFF001':
-        console.log('Clicked on button 1');
-        //updateColorInShader(colorOptions[0]);
-        //object.material.color.set(colors.green);
         if (!isAudioPlaying) {
           sound.play();
           isAudioPlaying = true;
@@ -350,47 +343,18 @@ const clickButton = (event) => {
           sound.pause();
           isAudioPlaying = false;
         }
-        /* object.position.x -= 0.03;
-        setTimeout(() => {
-          object.position.x += 0.03;
-        }, 300); */
         handleButtonClick(0, 0.03)
         break;
       case 'btn1001':
-        console.log('Clicked on button 1');
-        //updateColorInShader(colorOptions[0]);
-        //object.material.color.set(colors.green);
-        /* object.position.x -= 0.06;
-        setTimeout(() => {
-          object.position.x += 0.06;
-        }, setTime); */
         handleButtonClick(1, 0.06);
         break;
       case 'btn2001':
-        /* console.log('Clicked on button 2');
-        updateColorInShader(colorOptions[1]);
-        object.position.x -= 0.06;
-        setTimeout(() => {
-          object.position.x += 0.06;
-        }, setTime); */
         handleButtonClick(2, 0.06);
         break;
       case 'btn3001':
-       /*  updateColorInShader(colorOptions[2]);
-        console.log('Clicked on button 3');
-        object.position.x -= 0.06;
-        setTimeout(() => {
-          object.position.x += 0.06;
-        }, setTime); */
         handleButtonClick(3, 0.06);
         break;
       case 'btn4001':
-        /* updateColorInShader(colorOptions[3]);
-        console.log('Clicked on button 4');
-        object.position.x -= 0.06;
-        setTimeout(() => {
-          object.position.x += 0.06;
-        }, setTime); */
         handleButtonClick(4, 0.06);
         break;
       case 'btnCross001':
@@ -401,48 +365,51 @@ const clickButton = (event) => {
         const top = point.x < 0 && Math.abs(point.y) < Math.abs(point.x);
         const bottom = point.x > 0 && Math.abs(point.y) < Math.abs(point.x);
 
+        const handleCrossButton = (rotationAxis, rotationValue, shaderIncrementValue) => {
+          object.rotation[rotationAxis] += rotationValue; //rotate left
+          setTimeout(() => {
+            object.rotation[rotationAxis] -= rotationValue;
+          }, setTime);
+          updateShapeInShader({ incrementNr: shaderIncrementValue });
+        }
+
         if (object.name === 'btnCross001') {
           if (left) {
-            console.log('point', point);
-            console.log('LEFT');
-
-            object.rotation.y -= 0.1; //rotate left
+/*             object.rotation.y -= 0.1; //rotate left
             setTimeout(() => {
               object.rotation.y += 0.1;
             }, setTime);
-            updateShapeInShader({ incrementNr: 5 });
+            updateShapeInShader({ incrementNr: 5 }); */
+            handleCrossButton('y', -0.1, 5);
           } else if (right) {
-            console.log('RIGHT');
+         /*    console.log('RIGHT');
             object.rotation.y += 0.1; //rotate right
             setTimeout(() => {
               object.rotation.y -= 0.1;
             }, setTime);
-            updateShapeInShader({ incrementNr: 55 });
+            updateShapeInShader({ incrementNr: 55 }); */
+            handleCrossButton('y', 0.1, 55);
           } else if (bottom) {
-            console.log('BOTTOM');
+           /*  console.log('BOTTOM');
             updateShapeInShader({ incrementNr: 8 });
             object.rotation.z -= 0.1; //rotate down
             setTimeout(() => {
               object.rotation.z += 0.1;
-            }, setTime);
+            }, setTime); */
+            handleCrossButton('z', -0.1, 8);
           } else if (top) {
-            console.log('TOP');
+            /* console.log('TOP');
             updateShapeInShader({ incrementNr: 20 });
             console.log(updateShapeInShader);
             object.rotation.z += 0.1; //rotate left
             setTimeout(() => {
               object.rotation.z -= 0.1;
-            }, setTime);
+            }, setTime); */
+            handleCrossButton('z', 0.1, 20);
           }
         }
-        //updateShapeInShader(shapeOptions.increment);
-        /* object.position.x = 0.1;
-        setTimeout(() => {
-          object.position.x += 0.1;
-        }, setTime); */
         break;
       default:
-        console.log(' default - Clicked on button');
         break;
     }
   }
