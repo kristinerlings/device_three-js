@@ -1,14 +1,12 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-//import { GLTFLoader } from 'three/addons/GLTFLoader.js'; // I get network error if I use this one
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'; //use this until I ask the teacher : https://discourse.threejs.org/t/gltfloader-cannot-be-found/42254/4
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'; //addon not working - https://discourse.threejs.org/t/gltfloader-cannot-be-found/42254/4
 
-import portalVertexShader from './shaders/portal/vertex.glsl?raw'; //vite doesn't know about gls. Will get an error so: Will add ? and specify raw (tell it's just a string)
+import portalVertexShader from './shaders/portal/vertex.glsl?raw'; //tell vite it's a string ?raw
 import portalFragmentShader from './shaders/portal/fragment.glsl?raw';
 
 const $canvas = document.querySelector('.webglCanvas');
 const scene = new THREE.Scene();
-scene.add(new THREE.AxesHelper(2)); //remember to comment out
 const textureLoader = new THREE.TextureLoader();
 scene.background = textureLoader.load('assets/7861.jpg');
 
@@ -16,21 +14,17 @@ const ambientLight = new THREE.AmbientLight(0xffffff, 2);
 scene.add(ambientLight);
 
 // ========   FLOOR   ======== //
-const floorGeometry = new THREE.PlaneGeometry(10, 10); //new THREE.PlaneGeometry(5, 10); //create a plane - use buffer?
+const floorGeometry = new THREE.PlaneGeometry(10, 10); 
 const floorMaterial = new THREE.MeshStandardMaterial({
   // color: '#43515e', //'#242B32',
   color: '#ffffff',
   //wireframe: true,
-}); //create a material
-/* const floorTexture = new THREE.TextureLoader().load('assets/floor.jpg'); //load texture */
-//floorMaterial.map = floorTexture; //assign texture to material
+}); 
 const floorMesh = new THREE.Mesh(floorGeometry, floorMaterial);
 floorMesh.receiveShadow = true;
-floorMesh.rotation.x = Math.PI * -0.5; //rotate the floor
-floorMesh.position.y = -2; //move the floor down
-//round corners
-
-scene.add(floorMesh); //add the floor to the scene
+floorMesh.rotation.x = Math.PI * -0.5; 
+floorMesh.position.y = -2; 
+scene.add(floorMesh); 
 
 // ========   RAYCASTER   ======== //
 //https://threejs.org/docs/#api/en/core/Raycaster
@@ -58,7 +52,6 @@ orbitControls.enableDamping = true;
 
 const renderer = new THREE.WebGLRenderer({
   canvas: $canvas,
-  //alpha: true,
   antialias: true,
 });
 renderer.shadowMap.enabled = true;
@@ -68,16 +61,15 @@ renderer.setSize(size.width, size.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
 // ========   LIGHT   ======== //
-const light = new THREE.DirectionalLight('#ffffff', 3); //new THREE.SpotLight('#2e3033', 1000);
+const light = new THREE.DirectionalLight('#ffffff', 3);
 light.position.set(8, 10, 8.5);
 light.castShadow = true;
 const lightHelper = new THREE.DirectionalLightHelper(light, 3);
-scene.add(light, lightHelper); //take out helper before submitting
+scene.add(light, lightHelper);                    //take out helper before submitting
 const lightShadowHelper = new THREE.CameraHelper(light.shadow.camera);
 scene.add(lightShadowHelper);
 
-// ======== AUDIO ======= // 1. audio listener -> camera. 2. audio position -> 3dmodel/device
-// create an AudioListener and add it to the camera
+// ======== AUDIO ======= // 
 const listener = new THREE.AudioListener();
 camera.add(listener);
 const sound = new THREE.PositionalAudio(listener);
@@ -87,7 +79,6 @@ const audioLoader = new THREE.AudioLoader();
 audioLoader.load('assets/8bit-sample-69080.mp3', function (buffer) {
   sound.setBuffer(buffer);
   sound.setLoop(true);
-  //sound.setVolume(0.5); //maybe change later depending on camera distance?
   sound.setRefDistance(20);
 });
 console.log('audioLoader', audioLoader);
@@ -99,8 +90,6 @@ const deviceDisplayPlaneMaterial = new THREE.ShaderMaterial({
   uniforms: {
     iTime: { value: 0.0 },
     iResolution: { value: new THREE.Vector2(size.width, size.height) },
-    //iMouse: { value: new THREE.Vector2() },
-    // touchEffect: { value: 0.0 },
     u_backgroundColor: { value: new THREE.Vector4(0.0, 0.3, 0.65, 0.6) }, // default color
     u_shapeMapIncrementNr: { value: 8 },
     u_color1: { value: new THREE.Vector3(0.4235, 0.5843, 0.4588) },
@@ -111,14 +100,12 @@ const deviceDisplayPlaneMaterial = new THREE.ShaderMaterial({
 });
 
 // ========   LOADER   ======== //
-const loader = new GLTFLoader(); //to be able to load gltf files - blender
+const loader = new GLTFLoader();
 let clickableBlenderObjects = [];
 
 // Load a glTF resource
 loader.load(
-  // resource URL
   'assets/gameDeviceThree.glb',
-  // called when the resource is loaded
   (gltf) => {
     console.log('gltf:', gltf);
 
@@ -150,14 +137,10 @@ loader.load(
     });
 
     scene.add(gltf.scene);
-    //position scene it lower:
     gltf.scene.position.y = -1.5;
-    gltf.add(sound); // add sound to device :))))
+    gltf.add(sound); // add sound to device 
     // gltf.animations; // Array<THREE.AnimationClip>
-    // gltf.scene; // THREE.Group
-    // gltf.scenes; // Array<THREE.Group>
-    // gltf.cameras; // Array<THREE.Camera>
-    //  gltf.asset; // Object
+
   },
   // called while loading is progressing
   (xhr) => {
@@ -169,12 +152,13 @@ loader.load(
   }
 );
 
+
 // ========   Animate shader   ======== //
 const clock = new THREE.Clock();
 
 const initDraw = () => {
   const timePassed = clock.getElapsedTime(); 
-  deviceDisplayPlaneMaterial.uniforms.iTime.value = timePassed; //update iTime in my shader 
+  deviceDisplayPlaneMaterial.uniforms.iTime.value = timePassed; //update iTime in shader 
 
   hoverButton();
 
@@ -239,21 +223,7 @@ const updateShapeInShader = (shapeOptions) => {
     shapeOptions.incrementNr;
 };
 
-//listen to click on button
-/* document.querySelector('.btn__red').addEventListener('click', () => {
-  updateColorInShader(colorOptions[1]);
-  console.log(colorOptions[1]);
-  console.log('red');
-}); */
-/* const $btnColors = document.querySelectorAll('.btn__color');
-$btnColors.forEach((btn) => {
-  btn.addEventListener('click', () => {
-    const color = btn.dataset.color;
-    updateColorInShader(colorOptions[color]);
-    console.log(color);
-  });
-}); */
-
+// ========   Change color   ======== //
 const $btnShapes = document.querySelectorAll('.btn__shape');
 $btnShapes.forEach((btn) => {
   btn.addEventListener('click', () => {
@@ -264,8 +234,6 @@ $btnShapes.forEach((btn) => {
 });
 
 // ========   Mouse click   ======== //
-let intersectedObjects = []; // Array of objects that intersect with the raycaster
-
 let currentHoveredObject = null;
 let lastHoveredObject = null;
 function applyHoverMaterial(object) {
@@ -375,36 +343,12 @@ const clickButton = (event) => {
 
         if (object.name === 'btnCross001') {
           if (left) {
-/*             object.rotation.y -= 0.1; //rotate left
-            setTimeout(() => {
-              object.rotation.y += 0.1;
-            }, setTime);
-            updateShapeInShader({ incrementNr: 5 }); */
             handleCrossButton('y', -0.1, 5);
           } else if (right) {
-         /*    console.log('RIGHT');
-            object.rotation.y += 0.1; //rotate right
-            setTimeout(() => {
-              object.rotation.y -= 0.1;
-            }, setTime);
-            updateShapeInShader({ incrementNr: 55 }); */
             handleCrossButton('y', 0.1, 55);
           } else if (bottom) {
-           /*  console.log('BOTTOM');
-            updateShapeInShader({ incrementNr: 8 });
-            object.rotation.z -= 0.1; //rotate down
-            setTimeout(() => {
-              object.rotation.z += 0.1;
-            }, setTime); */
             handleCrossButton('z', -0.1, 8);
           } else if (top) {
-            /* console.log('TOP');
-            updateShapeInShader({ incrementNr: 20 });
-            console.log(updateShapeInShader);
-            object.rotation.z += 0.1; //rotate left
-            setTimeout(() => {
-              object.rotation.z -= 0.1;
-            }, setTime); */
             handleCrossButton('z', 0.1, 20);
           }
         }
@@ -420,7 +364,6 @@ $canvas.addEventListener('click', clickButton);
 // ========   Raycasting  - store mouse coordinates  ======== //
 const onPointerMove = (event) => {
   // calculate pointer position in normalized device coordinates
-  // (-1 to +1) for both components
   mousePointer.x = (event.clientX / window.innerWidth) * 2 - 1;
   mousePointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
 };

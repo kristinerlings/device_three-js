@@ -1,20 +1,5 @@
 //https://www.shadertoy.com/view/tsXBzS
 
-//uniform vec3      iResolution;           // viewport resolution (in pixels)
-//uniform float     iTime;                 // shader playback time (in seconds)
-//uniform float     iTimeDelta;            // render time (in seconds)
-//uniform float     iFrameRate;            // shader frame rate
-//uniform int       iFrame;                // shader playback frame
-////uniform float     iChannelTime[4];       // channel playback time (in seconds)
-//uniform vec3      iChannelResolution[4]; // channel resolution (in pixels)
-//uniform vec4      iMouse;                // mouse pixel coords. xy: current (if MLB down), zw: click
-//uniform samplerXX iChannel0..3;          // input channel. XX = 2D/Cube
-//uniform vec4      iDate;                 // (year, month, day, time in seconds)
-
-//IDEAS FOR INTERACTION
-//1. (VALUES IN RM function : values to change: d=map(p)*.9 distance, + adjust size of shape.)
-//2. Color values background (+alpha)
-
 
 //Unforms for interactions
 uniform int u_shapeMapIncrementNr;
@@ -23,19 +8,15 @@ uniform vec3 u_color1;
 uniform vec3 u_color2;
 //uniform float u_distance; 
 
-//uniform vec2 iMouse;
-//uniform float touchEffect;
-
 //pass uniforms to the fragment shader
 uniform float iTime;
 uniform vec2 iResolution;
 precision mediump float; //indicate medium precision for float - to work on e.g. mobile devices 
 
 
-varying vec2 vUv; //varying = input to the fragment shader from the vertex shader. uVu - uv coordinates of the current pixel from the vertex shader
+varying vec2 vUv; 
 
 
-// green:rgb(221,196,112) + yellow: (221,196,112)  /255 each for floating point nr.
 vec3 palette(float d){
     return mix(u_color1, u_color2, d);
     //return mix(vec3(0.4235, 0.5843, 0.4588),vec3(0.8667, 0.7686, 0.4392), d);
@@ -48,7 +29,7 @@ vec2 rotate(vec2 p,float a){
     return p*mat2(c,s,-s,c);
 }
 
-// CHANGE SHAPE HERE? - shape defined here!
+//shape defined here
 //p= position of the ray
 float map(vec3 p){
     for( int i = 0; i<u_shapeMapIncrementNr; ++i){    //can adjust increment 
@@ -69,21 +50,19 @@ float map(vec3 p){
 //ro = ray origin 
 //rd = ray direction 
 vec4 rm (vec3 ro, vec3 rd){
-    float t = 3.;              //0. //t = total distance
+    float t = 3.;              //t = total distance
     vec3 col = vec3(0.);
     float d; 
     for(float i =0.; i<80.; i++){
 		vec3 p = ro + rd*t;
         d = map(p)*.9;    //d = distance 
-        if(d<0.0){     //adjust this value to change the size of the shape (could adjust 0.0 to 0.7)
+        if(d<0.0){     //adjust value to change the size of the shape 
             break;
         }
         if(d>100.){
         	break;
         }
-        //col+=vec3(0.6,0.8,0.8)/(400.*(d));
-        //col =0.9 * col + palette(length(p)*.1)/(400.*(d)); // added 0.9*col to make it more transparent
-        col =0.9 * col + palette(length(p)*.5)/(500.*(d));
+        col =0.9 * col + palette(length(p)*.5)/(500.*(d));  // 0.9*col to make it more transparent
         
         t+=d;
     }
@@ -103,32 +82,22 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     vec3 cs = normalize(cross(cf,vec3(0.,1.,0.))); //cs = camera side
     vec3 cu = normalize(cross(cf,cs)); //cu = camera up
     
-    vec3 uuv = ro+cf*3. + uv.x*cs + uv.y*cu; //uuv = uv coordinates  - can adjust 
-    
+    vec3 uuv = ro+cf*3. + uv.x*cs + uv.y*cu; //uuv = uv coordinates 
     vec3 rd = normalize(uuv-ro); //rd = ray direction
-    
     vec4 col = rm(ro,rd); 
     
-    
-    //fragColor = col;
-
-    // Check the distance, if it's beyond a threshold, set background:: access alpha col.a
+    // Check the distance and set background + access alpha col.a
     if(col.a > 0.2) {
-        fragColor = col; // Set the fragment color as calculated
+        fragColor = col; // Set the fragment color
     } else {
-        fragColor = u_backgroundColor; // vec4(0.0,0.3,0.65, 0.6);  // Set the background color  0.0,0.3,0.65, 0.6
+        fragColor = u_backgroundColor; 
     }
 }
 
 void main()
 {
   vec2 fragCoord = iResolution * vUv;
-  //gl_FragColor = vec4(u_backgroundColor.xyz, u_backgroundColor.w);
   mainImage(gl_FragColor, fragCoord);
-  //mouse move interaction
- // float distanceFromMouse = distance(iMouse, fragCoord);
- // float colorEffect = max(0.0, 1.0 - distanceFromMouse / 30.0 * touchEffect);
-  //gl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(1.0), colorEffect);
 }
 
 
@@ -140,13 +109,3 @@ void main()
 }
 */
 
-
-/*
-//new main
-//threejs doesn't use fragColor and fragCoord in the main function.. 
-
-//Modify my UV coordinates to fit threeJS naming conventions
-//fragCoord = gl_FragCoord.xy; -> gives the current pixel coordinate
-
-// change output color fragColor => gl_FragColor
-*/
