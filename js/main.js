@@ -322,15 +322,26 @@ const clickButton = (event) => {
   if (intersects.length > 0) {
     const object = intersects[0].object;
     const point = intersects[0].point; // Intersection point in world coordinates + button
-    /* if(object.name === ''){
-      console.log('Clicked on button');
-    } */
+    object.worldToLocal(point); //translate the point to local space of the button -> Check the direction of the 'cross' button
+
     const setTime = 300;
+
+    const handleButtonClick = (colorIndex, positionValue ) => {
+      updateColorInShader(colorOptions[colorIndex - 1]);
+      object.position.x -= positionValue;
+      setTimeout(() => {
+        object.position.x += positionValue;
+      }, setTime);
+     /*  object.position.x -= 0.06;
+      setTimeout(() => {
+        object.position.x += 0.06;
+      }, timeValue); */
+    }
 
     switch (object.name) {
       case 'btnOFF001':
         console.log('Clicked on button 1');
-        updateColorInShader(colorOptions[0]);
+        //updateColorInShader(colorOptions[0]);
         //object.material.color.set(colors.green);
         if (!isAudioPlaying) {
           sound.play();
@@ -339,51 +350,53 @@ const clickButton = (event) => {
           sound.pause();
           isAudioPlaying = false;
         }
-        object.position.x -= 0.03;
+        /* object.position.x -= 0.03;
         setTimeout(() => {
           object.position.x += 0.03;
-        }, 300);
+        }, 300); */
+        handleButtonClick(0, 0.03)
         break;
       case 'btn1001':
         console.log('Clicked on button 1');
-        updateColorInShader(colorOptions[0]);
+        //updateColorInShader(colorOptions[0]);
         //object.material.color.set(colors.green);
-        object.position.x -= 0.06;
+        /* object.position.x -= 0.06;
         setTimeout(() => {
           object.position.x += 0.06;
-        }, setTime);
+        }, setTime); */
+        handleButtonClick(1, 0.06);
         break;
       case 'btn2001':
-        console.log('Clicked on button 2');
+        /* console.log('Clicked on button 2');
         updateColorInShader(colorOptions[1]);
         object.position.x -= 0.06;
         setTimeout(() => {
           object.position.x += 0.06;
-        }, setTime);
+        }, setTime); */
+        handleButtonClick(2, 0.06);
         break;
       case 'btn3001':
-        updateColorInShader(colorOptions[2]);
+       /*  updateColorInShader(colorOptions[2]);
         console.log('Clicked on button 3');
         object.position.x -= 0.06;
         setTimeout(() => {
           object.position.x += 0.06;
-        }, setTime);
+        }, setTime); */
+        handleButtonClick(3, 0.06);
         break;
       case 'btn4001':
-        updateColorInShader(colorOptions[3]);
+        /* updateColorInShader(colorOptions[3]);
         console.log('Clicked on button 4');
         object.position.x -= 0.06;
         setTimeout(() => {
           object.position.x += 0.06;
-        }, setTime);
+        }, setTime); */
+        handleButtonClick(4, 0.06);
         break;
       case 'btnCross001':
         console.log('Clicked on button cross');
-        
-        //translate the point to local space of the button - can now check if the direction of the button
-        object.worldToLocal(point); 
 
-        const left = point.z > 0 && Math.abs(point.x) < Math.abs(point.z); 
+        const left = point.z > 0 && Math.abs(point.x) < Math.abs(point.z);
         const right = point.z < 0 && Math.abs(point.x) < Math.abs(point.z);
         const top = point.x < 0 && Math.abs(point.y) < Math.abs(point.x);
         const bottom = point.x > 0 && Math.abs(point.y) < Math.abs(point.x);
@@ -420,8 +433,6 @@ const clickButton = (event) => {
             setTimeout(() => {
               object.rotation.z -= 0.1;
             }, setTime);
-
-            //console.log(updateColorInShader(shapeOptions.incrementNr2));
           }
         }
         //updateShapeInShader(shapeOptions.increment);
