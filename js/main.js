@@ -12,10 +12,8 @@ scene.add(new THREE.AxesHelper(2)); //remember to comment out
 const textureLoader = new THREE.TextureLoader();
 scene.background = textureLoader.load('assets/7861.jpg');
 
-//scene.background = new THREE.Color('#89A4BF'); //('#d9b99b')
-
 const ambientLight = new THREE.AmbientLight(0xffffff, 2);
-// scene.add(ambientLight);
+scene.add(ambientLight);
 
 // ========   FLOOR   ======== //
 const floorGeometry = new THREE.PlaneGeometry(10, 10); //new THREE.PlaneGeometry(5, 10); //create a plane - use buffer?
@@ -26,10 +24,10 @@ const floorMaterial = new THREE.MeshStandardMaterial({
 }); //create a material
 /* const floorTexture = new THREE.TextureLoader().load('assets/floor.jpg'); //load texture */
 //floorMaterial.map = floorTexture; //assign texture to material
-const floorMesh = new THREE.Mesh(floorGeometry, floorMaterial); //create a mesh
-floorMesh.receiveShadow = true; //receive shadows
-floorMesh.rotation.x = Math.PI * -0.5; //rotate the floor 90 degrees
-floorMesh.position.y = -2.5; //move the floor down
+const floorMesh = new THREE.Mesh(floorGeometry, floorMaterial);
+floorMesh.receiveShadow = true;
+floorMesh.rotation.x = Math.PI * -0.5; //rotate the floor
+floorMesh.position.y = -2; //move the floor down
 //round corners
 
 scene.add(floorMesh); //add the floor to the scene
@@ -73,10 +71,6 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 const light = new THREE.DirectionalLight('#ffffff', 3); //new THREE.SpotLight('#2e3033', 1000);
 light.position.set(8, 10, 8.5);
 light.castShadow = true;
-/* light.shadow.mapSize.width = 1024;
-light.shadow.mapSize.height = 1024; */
-// light.shadow.camera.near = 1;
-// light.shadow.camera.far = 50;
 const lightHelper = new THREE.DirectionalLightHelper(light, 3);
 scene.add(light, lightHelper); //take out helper before submitting
 const lightShadowHelper = new THREE.CameraHelper(light.shadow.camera);
@@ -86,10 +80,6 @@ scene.add(lightShadowHelper);
 // create an AudioListener and add it to the camera
 const listener = new THREE.AudioListener();
 camera.add(listener);
-
-// create a global audio source
-//const sound = new THREE.Audio(listener);
-// create the PositionalAudio object (passing in the listener)
 const sound = new THREE.PositionalAudio(listener);
 
 // load a sound and set it as the Audio object's buffer
@@ -104,30 +94,13 @@ console.log('audioLoader', audioLoader);
 
 let isAudioPlaying = false;
 
-// ========   BAKED   ======== //
-const colorDevice = {
-  red: '#D13F2E',
-  dark: '#140006',
-};
-//const textureBlender = new THREE.TextureLoader().load('assets/baked3.jpg');
-//textureBlender.flipY = false; //y axis of textures I load is inverted. This is boolean... not -1
-//THe meshBasicMaterial doesn't receive shadows/light??? MeshStandardMaterial -> does not work ?
-/* const material = new THREE.MeshBasicMaterial({
-  color: colorDevice.red,
-}); */
-const material = new THREE.MeshStandardMaterial({
-  color: 0xffffff,
-  emissive: colorDevice.red,
-});
-
-//uniforms: pass data from js to shader (vertex and fragment)
 // ========   PORTAL/Screen-device   ======== //
 const deviceDisplayPlaneMaterial = new THREE.ShaderMaterial({
   uniforms: {
     iTime: { value: 0.0 },
     iResolution: { value: new THREE.Vector2(size.width, size.height) },
     //iMouse: { value: new THREE.Vector2() },
-    touchEffect: { value: 0.0 },
+    // touchEffect: { value: 0.0 },
     u_backgroundColor: { value: new THREE.Vector4(0.0, 0.3, 0.65, 0.6) }, // default color
     u_shapeMapIncrementNr: { value: 8 },
     u_color1: { value: new THREE.Vector3(0.4235, 0.5843, 0.4588) },
@@ -148,105 +121,34 @@ loader.load(
   // called when the resource is loaded
   (gltf) => {
     console.log('gltf:', gltf);
-    //loop through each of the children (assign the model to all of the children):
+
     gltf.scene.traverse((child) => {
-      if (child.name === 'device001') {
-        // child.material = new THREE.MeshStandardMaterial({
-        //   color: colorDevice.red,
-        // });
-        // child.castShadow = true;
-        // child.receiveShadow = true;
-      }
       console.log('traverse, blender child name:', child.name);
+
       if (child.name === 'screenShader001') {
-        //display shaderToy on device screen
         child.material = deviceDisplayPlaneMaterial;
-      } else {
-        // child.material = material; //child of material, is same as material
       }
 
-      console.log('isMesh:', child);
       if (child.isMesh) {
         child.castShadow = true;
-        child.receiveShadow = true; 
-        switch (child.name) {
-          case 'device001':
-            /*      child.material = material;
-            child.receiveShadow = true; */
-            break;
-          case 'btn1001':
-            console.log('btn1001');
-            clickableBlenderObjects.push(child);
-            //child.material.color.set(colorDevice.red);
-            /* child.material = new THREE.MeshStandardMaterial({
-              color: colorDevice.dark,
-            }); */
-            /* child.material.castShadow = true;
-            child.material.receiveShadow = true; */
-            break;
-          case 'btn2001':
-            console.log('btn2');
-            clickableBlenderObjects.push(child);
-            child.material.color.set(colorDevice.dark);
+        child.receiveShadow = true;
 
-          /*   child.material = new THREE.MeshStandardMaterial({
-              color: colorDevice.dark,
-            }); */
-            break;
-          case 'btn3001':
-            console.log('btn301');
-            clickableBlenderObjects.push(child);
-             child.material.color.set(colorDevice.dark);
-            /*  child.material = new THREE.MeshStandardMaterial({
-              color: colorDevice.dark,
-            }); */
-            break;
-          case 'btn4001':
-            console.log('btn401');
-            clickableBlenderObjects.push(child);
-             child.material.color.set(colorDevice.dark);
-            /* child.material = new THREE.MeshStandardMaterial({
-              color: colorDevice.dark,
-            }); */
-            break;
-          case 'btnCross001':
-            console.log('btnCross001');
-            clickableBlenderObjects.push(child);
-             child.material.color.set(colorDevice.dark);
-            /*  child.material = new THREE.MeshStandardMaterial({
-              color: colorDevice.dark,
-            }); */
-            break;
-          case 'device-dark001':
-             child.material.color.set(colorDevice.dark);
-            /*  child.material = new THREE.MeshStandardMaterial({
-              color: colorDevice.dark,
-            }); */
-            break;
-          case 'btnOFF001':
-            clickableBlenderObjects.push(child);
-             child.material.color.set(colorDevice.dark);
-            /*  child.material = new THREE.MeshStandardMaterial({
-              color: colorDevice.dark,
-            }); */
-            break;
-          case 'btnSmall1001':
-            clickableBlenderObjects.push(child);
-             child.material.color.set(colorDevice.dark);
-            /*  child.material = new THREE.MeshStandardMaterial({
-              color: colorDevice.dark,
-            }); */
-            break;
-          case 'btnSmall2001':
-            clickableBlenderObjects.push(child);
-             child.material.color.set(colorDevice.dark);
-            /*  child.material = new THREE.MeshStandardMaterial({
-              color: colorDevice.dark,
-            }); */
-            break;
+        const clickableButtons = [
+          'btn1001',
+          'btn2001',
+          'btn3001',
+          'btn4001',
+          'btnCross001',
+          'btnOFF001',
+        ];
+
+        if (clickableButtons.includes(child.name)) {
+          console.log(child.name);
+          clickableBlenderObjects.push(child);
         }
       }
     });
+
     scene.add(gltf.scene);
     //position scene it lower:
     gltf.scene.position.y = -1.5;
@@ -267,23 +169,17 @@ loader.load(
   }
 );
 
-
-// ========   Animate my shader: update iTime /in my animation loop(keep the animation running)  ======== //
+// ========   Animate shader   ======== //
 const clock = new THREE.Clock();
 
-//Draw loop that executes the renderer
 const initDraw = () => {
+  const timePassed = clock.getElapsedTime(); 
+  deviceDisplayPlaneMaterial.uniforms.iTime.value = timePassed; //update iTime in my shader 
 
-  //update time
-  const timePassed = clock.getElapsedTime(); //get time passed since clock started - returns seconds passed and updates iTime
-  deviceDisplayPlaneMaterial.uniforms.iTime.value = timePassed; //update iTime in my shader -
+  hoverButton();
 
-  // hover button
-   hoverButton(); 
-
-  //
-  renderer.render(scene, camera); //draw the scene
-  window.requestAnimationFrame(initDraw); //call the draw function again to make it loop :D !
+  renderer.render(scene, camera); 
+  window.requestAnimationFrame(initDraw); // make it loop
 };
 
 const colors = {
@@ -377,15 +273,12 @@ function applyHoverMaterial(object) {
     object.originalMaterial = object.material.clone(); // Store the original material
   }
 
-
-   object.material = new THREE.MeshStandardMaterial({
-     
-   // color: '#ffff',
+  object.material = new THREE.MeshStandardMaterial({
+    // color: '#ffff',
     emissive: '#DAAEF7',
-     //opacity: 0.5, // 20% opacity which means it's 80% transparent
-     //transparent: true,
-
-   });
+    opacity: 0.6, 
+    transparent: true,
+  });
 }
 
 function resetMaterial(object) {
@@ -396,30 +289,30 @@ function resetMaterial(object) {
 }
 
 const hoverButton = () => {
-   raycaster.setFromCamera(mousePointer, camera);
-   const intersects = raycaster.intersectObjects(clickableBlenderObjects);
+  raycaster.setFromCamera(mousePointer, camera);
+  const intersects = raycaster.intersectObjects(clickableBlenderObjects);
 
-   if (intersects.length > 0) {
-     const object = intersects[0].object;
+  if (intersects.length > 0) {
+    const object = intersects[0].object;
 
-     // Only hover the closest object
-     if (lastHoveredObject && lastHoveredObject !== object) {
-       // Reset the color or material of the last hovered object
-       resetMaterial(lastHoveredObject);
-     }
+    // Only hover the closest object
+    if (lastHoveredObject && lastHoveredObject !== object) {
+      // Reset the color or material of the last hovered object
+      resetMaterial(lastHoveredObject);
+    }
 
-     // Apply hover effect to the currently hovered object
-     applyHoverMaterial(object);
+    // Apply hover effect to the currently hovered object
+    applyHoverMaterial(object);
 
-     // Update the lastHoveredObject reference
-     lastHoveredObject = object;
-   } else {
-     if (lastHoveredObject) {
-       // If no objects are hovered, reset the last hovered object
-       resetMaterial(lastHoveredObject);
-       lastHoveredObject = null;
-     }
-   }
+    // Update the lastHoveredObject reference
+    lastHoveredObject = object;
+  } else {
+    if (lastHoveredObject) {
+      // If no objects are hovered, reset the last hovered object
+      resetMaterial(lastHoveredObject);
+      lastHoveredObject = null;
+    }
+  }
 };
 
 const clickButton = (event) => {
@@ -486,10 +379,11 @@ const clickButton = (event) => {
         break;
       case 'btnCross001':
         console.log('Clicked on button cross');
+        
+        //translate the point to local space of the button - can now check if the direction of the button
+        object.worldToLocal(point); 
 
-        object.worldToLocal(point); //translate the point to local space of the button - can now check if the point is on the left, right, top or bottom of the button
-
-        const left = point.z > 0 && Math.abs(point.x) < Math.abs(point.z); //did .y first but that didn't work. noticed in console that it was z that changed, not y. Is the blue helperline the z axis?
+        const left = point.z > 0 && Math.abs(point.x) < Math.abs(point.z); 
         const right = point.z < 0 && Math.abs(point.x) < Math.abs(point.z);
         const top = point.x < 0 && Math.abs(point.y) < Math.abs(point.x);
         const bottom = point.x > 0 && Math.abs(point.y) < Math.abs(point.x);
@@ -545,18 +439,15 @@ const clickButton = (event) => {
 
 $canvas.addEventListener('click', clickButton);
 
-
-
 // ========   Raycasting  - store mouse coordinates  ======== //
 const onPointerMove = (event) => {
   // calculate pointer position in normalized device coordinates
   // (-1 to +1) for both components
-
   mousePointer.x = (event.clientX / window.innerWidth) * 2 - 1;
   mousePointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
 };
 
-window.addEventListener('pointermove', onPointerMove); //listen to mouse move
+window.addEventListener('pointermove', onPointerMove); 
 
 window.addEventListener('pointerout', () => {
   if (currentHoveredObject) {
@@ -564,6 +455,7 @@ window.addEventListener('pointerout', () => {
     currentHoveredObject = null;
   }
 });
+
 
 //on resize -> update size, camera and renderer
 window.addEventListener('resize', () => {
