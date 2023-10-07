@@ -168,7 +168,7 @@ loader.load(
       console.log('isMesh:', child);
       if (child.isMesh) {
         child.castShadow = true;
-        child.receiveShadow = true;
+        child.receiveShadow = true; 
         switch (child.name) {
           case 'device001':
             /*      child.material = material;
@@ -178,22 +178,25 @@ loader.load(
             console.log('btn1001');
             clickableBlenderObjects.push(child);
             //child.material.color.set(colorDevice.red);
-            child.material = new THREE.MeshStandardMaterial({
+            /* child.material = new THREE.MeshStandardMaterial({
               color: colorDevice.dark,
-            });
+            }); */
             /* child.material.castShadow = true;
             child.material.receiveShadow = true; */
             break;
           case 'btn2001':
             console.log('btn2');
             clickableBlenderObjects.push(child);
-            child.material = new THREE.MeshStandardMaterial({
+            child.material.color.set(colorDevice.dark);
+
+          /*   child.material = new THREE.MeshStandardMaterial({
               color: colorDevice.dark,
-            });
+            }); */
             break;
           case 'btn3001':
             console.log('btn301');
             clickableBlenderObjects.push(child);
+             child.material.color.set(colorDevice.dark);
             /*  child.material = new THREE.MeshStandardMaterial({
               color: colorDevice.dark,
             }); */
@@ -201,6 +204,7 @@ loader.load(
           case 'btn4001':
             console.log('btn401');
             clickableBlenderObjects.push(child);
+             child.material.color.set(colorDevice.dark);
             /* child.material = new THREE.MeshStandardMaterial({
               color: colorDevice.dark,
             }); */
@@ -208,29 +212,34 @@ loader.load(
           case 'btnCross001':
             console.log('btnCross001');
             clickableBlenderObjects.push(child);
+             child.material.color.set(colorDevice.dark);
             /*  child.material = new THREE.MeshStandardMaterial({
               color: colorDevice.dark,
             }); */
             break;
           case 'device-dark001':
+             child.material.color.set(colorDevice.dark);
             /*  child.material = new THREE.MeshStandardMaterial({
               color: colorDevice.dark,
             }); */
             break;
           case 'btnOFF001':
             clickableBlenderObjects.push(child);
+             child.material.color.set(colorDevice.dark);
             /*  child.material = new THREE.MeshStandardMaterial({
               color: colorDevice.dark,
             }); */
             break;
           case 'btnSmall1001':
             clickableBlenderObjects.push(child);
+             child.material.color.set(colorDevice.dark);
             /*  child.material = new THREE.MeshStandardMaterial({
               color: colorDevice.dark,
             }); */
             break;
           case 'btnSmall2001':
             clickableBlenderObjects.push(child);
+             child.material.color.set(colorDevice.dark);
             /*  child.material = new THREE.MeshStandardMaterial({
               color: colorDevice.dark,
             }); */
@@ -240,7 +249,7 @@ loader.load(
     });
     scene.add(gltf.scene);
     //position scene it lower:
-    // gltf.scene.position.y = -1.5;
+    gltf.scene.position.y = -1.5;
     gltf.add(sound); // add sound to device :))))
     // gltf.animations; // Array<THREE.AnimationClip>
     // gltf.scene; // THREE.Group
@@ -258,27 +267,19 @@ loader.load(
   }
 );
 
-//test object: create simple cube
-//const geometry = new THREE.BoxGeometry(1, 1, 1);
-
-/* const cube = new THREE.Mesh(geometry, material);
-scene.add(cube);
-console.log(cube); */
 
 // ========   Animate my shader: update iTime /in my animation loop(keep the animation running)  ======== //
 const clock = new THREE.Clock();
 
 //Draw loop that executes the renderer
 const initDraw = () => {
-  //decrease touch effect over time
-  //deviceDisplayPlaneMaterial.uniforms.touchEffect.value *= 1.0;
 
   //update time
   const timePassed = clock.getElapsedTime(); //get time passed since clock started - returns seconds passed and updates iTime
   deviceDisplayPlaneMaterial.uniforms.iTime.value = timePassed; //update iTime in my shader -
 
   // hover button
-  hoverButton();
+   hoverButton(); 
 
   //
   renderer.render(scene, camera); //draw the scene
@@ -368,37 +369,57 @@ $btnShapes.forEach((btn) => {
 
 // ========   Mouse click   ======== //
 let intersectedObjects = []; // Array of objects that intersect with the raycaster
-const hoverButton = () => {
-  //make transparent
-  raycaster.setFromCamera(mousePointer, camera); //get raycaster to know where the mouse is pointing
-  const intersects = raycaster.intersectObjects(clickableBlenderObjects); //-> the 3d obj I choose     //(scene.children, true); //get all the objects that intersects with the raycaster
-  //loop the intersects
 
-  // Reset all previously intersected objects
-  intersectedObjects.forEach((object) => {
-    object.material.color.set(colorDevice.dark);
-    object.material.opacity = 1;
-  });
-
-  intersectedObjects = []; // Clear the array
-
-  // Set color for currently intersected objects
-  for (let i = 0; i < intersects.length; i++) {
-    if (intersects[i].object.name === 'btnOFF001') {
-      intersects[i].object.material = new THREE.MeshStandardMaterial({
-        color: colors.green,
-      }); ///color.set(colors.green);
-    } else if (intersects[i].object.name === 'btnCross001') {
-      intersects[i].object.material.color.set(colors.orange);
-    } else if (intersects[i].object.name === 'btnSmall1001') {
-      intersects[i].object.material.color.set(colors.yellow);
-    } else {
-      intersects[i].object.material.color.set(colors.blue);
-    }
-    /*     intersects[i].object.material.opacity = 0.5; */
-    intersectedObjects.push(intersects[i].object); // Add to array for next frame
+let currentHoveredObject = null;
+let lastHoveredObject = null;
+function applyHoverMaterial(object) {
+  if (!object.originalMaterial) {
+    object.originalMaterial = object.material.clone(); // Store the original material
   }
-  // console.log(intersectedObjects);
+
+
+   object.material = new THREE.MeshStandardMaterial({
+     
+   // color: '#ffff',
+    emissive: '#DAAEF7',
+     //opacity: 0.5, // 20% opacity which means it's 80% transparent
+     //transparent: true,
+
+   });
+}
+
+function resetMaterial(object) {
+  if (object.originalMaterial) {
+    object.material = object.originalMaterial;
+    object.originalMaterial = null;
+  }
+}
+
+const hoverButton = () => {
+   raycaster.setFromCamera(mousePointer, camera);
+   const intersects = raycaster.intersectObjects(clickableBlenderObjects);
+
+   if (intersects.length > 0) {
+     const object = intersects[0].object;
+
+     // Only hover the closest object
+     if (lastHoveredObject && lastHoveredObject !== object) {
+       // Reset the color or material of the last hovered object
+       resetMaterial(lastHoveredObject);
+     }
+
+     // Apply hover effect to the currently hovered object
+     applyHoverMaterial(object);
+
+     // Update the lastHoveredObject reference
+     lastHoveredObject = object;
+   } else {
+     if (lastHoveredObject) {
+       // If no objects are hovered, reset the last hovered object
+       resetMaterial(lastHoveredObject);
+       lastHoveredObject = null;
+     }
+   }
 };
 
 const clickButton = (event) => {
@@ -536,6 +557,13 @@ const onPointerMove = (event) => {
 };
 
 window.addEventListener('pointermove', onPointerMove); //listen to mouse move
+
+window.addEventListener('pointerout', () => {
+  if (currentHoveredObject) {
+    currentHoveredObject.material.color.set(colorDevice.dark); // Reset to its default color
+    currentHoveredObject = null;
+  }
+});
 
 //on resize -> update size, camera and renderer
 window.addEventListener('resize', () => {
