@@ -1,33 +1,39 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'; //addon not working - https://discourse.threejs.org/t/gltfloader-cannot-be-found/42254/4
-
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'; //https://discourse.threejs.org/t/gltfloader-cannot-be-found/42254/4
 import portalVertexShader from './shaders/portal/vertex.glsl?raw'; //tell vite it's a string ?raw
 import portalFragmentShader from './shaders/portal/fragment.glsl?raw';
+
 
 const $canvas = document.querySelector('.webglCanvas');
 const scene = new THREE.Scene();
 const textureLoader = new THREE.TextureLoader();
 scene.background = textureLoader.load('assets/7861.jpg');
 
-const ambientLight = new THREE.AmbientLight(0xffffff, 2);
+const ambientLight = new THREE.AmbientLight(0xffffff, 1);
 scene.add(ambientLight);
 
 // ========   FLOOR   ======== //
-const floorGeometry = new THREE.PlaneGeometry(10, 10); 
+/* const geometry = new THREE.CylinderGeometry(2, 2, 2, 32);
+const material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+const cylinder = new THREE.Mesh(geometry, material); */
+/* scene.add(cylinder); */
+const floorGeometry = new THREE.CylinderGeometry(2, 2, 1, 32);
+const floorTexture = textureLoader.load('assets/augustine-wong-li0iC0rjvvg-unsplash.jpg'
+);
 const floorMaterial = new THREE.MeshStandardMaterial({
-  // color: '#43515e', //'#242B32',
   color: '#ffffff',
-  //wireframe: true,
-}); 
+  map: floorTexture,
+});
 const floorMesh = new THREE.Mesh(floorGeometry, floorMaterial);
 floorMesh.receiveShadow = true;
-floorMesh.rotation.x = Math.PI * -0.5; 
-floorMesh.position.y = -2; 
-scene.add(floorMesh); 
+/* floorMesh.rotation.x = Math.PI * -0.5; */
+floorMesh.position.y = -2.5;
+scene.add(floorMesh);
+
+
 
 // ========   RAYCASTER   ======== //
-//https://threejs.org/docs/#api/en/core/Raycaster
 const raycaster = new THREE.Raycaster();
 const mousePointer = new THREE.Vector2();
 
@@ -64,12 +70,10 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 const light = new THREE.DirectionalLight('#ffffff', 3);
 light.position.set(8, 10, 8.5);
 light.castShadow = true;
-const lightHelper = new THREE.DirectionalLightHelper(light, 3);
-scene.add(light, lightHelper);                    //take out helper before submitting
-const lightShadowHelper = new THREE.CameraHelper(light.shadow.camera);
-scene.add(lightShadowHelper);
+scene.add(light)
 
-// ======== AUDIO ======= // 
+
+// ======== AUDIO ======= //
 const listener = new THREE.AudioListener();
 camera.add(listener);
 const sound = new THREE.PositionalAudio(listener);
@@ -103,7 +107,6 @@ const deviceDisplayPlaneMaterial = new THREE.ShaderMaterial({
 const loader = new GLTFLoader();
 let clickableBlenderObjects = [];
 
-// Load a glTF resource
 loader.load(
   'assets/gameDeviceThree.glb',
   (gltf) => {
@@ -135,36 +138,107 @@ loader.load(
         }
       }
     });
-
     scene.add(gltf.scene);
     gltf.scene.position.y = -1.5;
-    gltf.add(sound); // add sound to device 
-    // gltf.animations; // Array<THREE.AnimationClip>
-
+    gltf.add(sound);
+  
   },
   // called while loading is progressing
   (xhr) => {
     console.log((xhr.loaded / xhr.total) * 100 + '% loaded');
   },
-  // called when loading has errors
   (error) => {
     console.log('An error happened');
   }
 );
 
 
+
 // ========   Animate shader   ======== //
 const clock = new THREE.Clock();
 
+
 const initDraw = () => {
-  const timePassed = clock.getElapsedTime(); 
-  deviceDisplayPlaneMaterial.uniforms.iTime.value = timePassed; //update iTime in shader 
+  const timePassed = clock.getElapsedTime();
+  deviceDisplayPlaneMaterial.uniforms.iTime.value = timePassed; //update iTime in shader
 
   hoverButton();
 
-  renderer.render(scene, camera); 
+  renderer.render(scene, camera);
   window.requestAnimationFrame(initDraw); // make it loop
 };
+
+function createCloud() {
+  // Create an empty container that will hold the cloud parts
+  const cloud = new THREE.Object3D();
+
+  // Sphere geometry for the cloud parts
+  const geom = new THREE.SphereGeometry(0.7, 32, 32);
+  const mat = new THREE.MeshPhongMaterial({ color: '#ffffff' });
+
+  // Using a loop to add exactly 5 spheres
+  for (let i = 0; i < 5; i++) {
+    const sphere = new THREE.Mesh(geom, mat);
+
+    // Position spheres with a little bit of randomness for natural look
+    sphere.position.set(
+      Math.random() * 0.5 - 0.5,
+      Math.random() * 1 - 0.5,
+      Math.random() * 2 - 0.5
+    );
+
+    // Allow sphere to cast and receive shadows
+    sphere.castShadow = true;
+    sphere.receiveShadow = true;
+
+    // Add sphere to the cloud container
+    cloud.add(sphere);
+  }
+
+  // Return the cloud so it can be added to the scene externally
+  return cloud;
+}
+
+const clouds = []; // An array to store all the cloud containers
+
+function spawnClouds(scene, numClouds) {
+  for (let i = 0; i < numClouds; i++) {
+    const cloud = createCloud();
+
+    // Initially position clouds off to the right so they can move left into view
+    cloud.position.set(
+      Math.random() * 3 - 1, // Range from -5 to 5
+      Math.random() * 7 - 8, // Range from -5 to 5
+      Math.random() * 5 - 3 // Range from -5 to 5
+    );
+
+
+    clouds.push(cloud);
+    scene.add(cloud);
+  }
+}
+
+function animateClouds() {
+    clouds.forEach((cloud) => {
+        cloud.rotation.y += 0.01;
+    });
+
+
+}
+
+// This is the main animation loop
+function tanimate() {
+  requestAnimationFrame(tanimate);
+  animateClouds();
+ 
+}
+
+// Assuming `scene` has already been defined elsewhere in your code.
+spawnClouds(scene, 25); // for example, add 10 clouds
+
+// Start the animation
+tanimate();
+
 
 const colors = {
   green: '#6C9575',
@@ -236,20 +310,20 @@ $btnShapes.forEach((btn) => {
 // ========   Mouse click   ======== //
 let currentHoveredObject = null;
 let lastHoveredObject = null;
-function applyHoverMaterial(object) {
+const applyHoverMaterial = (object) => {
   if (!object.originalMaterial) {
     object.originalMaterial = object.material.clone(); // Store the original material
   }
 
   object.material = new THREE.MeshStandardMaterial({
-    // color: '#ffff',
-    emissive: '#DAAEF7',
-    opacity: 0.6, 
+    color: '#ffffff',
+    emissive: '#000000',
+    opacity: 0.8,
     transparent: true,
   });
 }
 
-function resetMaterial(object) {
+const resetMaterial = (object) => {
   if (object.originalMaterial) {
     object.material = object.originalMaterial;
     object.originalMaterial = null;
@@ -265,18 +339,13 @@ const hoverButton = () => {
 
     // Only hover the closest object
     if (lastHoveredObject && lastHoveredObject !== object) {
-      // Reset the color or material of the last hovered object
-      resetMaterial(lastHoveredObject);
+      resetMaterial(lastHoveredObject); //reset material
     }
-
-    // Apply hover effect to the currently hovered object
     applyHoverMaterial(object);
-
-    // Update the lastHoveredObject reference
-    lastHoveredObject = object;
+    lastHoveredObject = object; // Update 
   } else {
     if (lastHoveredObject) {
-      // If no objects are hovered, reset the last hovered object
+      // no hover, reset the last hovered object
       resetMaterial(lastHoveredObject);
       lastHoveredObject = null;
     }
@@ -284,23 +353,23 @@ const hoverButton = () => {
 };
 
 const clickButton = (event) => {
-  raycaster.setFromCamera(mousePointer, camera); //get raycaster to know where the mouse is pointing
-  const intersects = raycaster.intersectObjects(clickableBlenderObjects); //I get all the objects that intersects with the raycaster
+  raycaster.setFromCamera(mousePointer, camera);
+  const intersects = raycaster.intersectObjects(clickableBlenderObjects); //get all the objects that intersects with the raycaster
 
   if (intersects.length > 0) {
     const object = intersects[0].object;
     const point = intersects[0].point; // Intersection point in world coordinates + button
-    object.worldToLocal(point); //translate the point to local space of the button -> Check the direction of the 'cross' button
+    object.worldToLocal(point); //translate the point to local space of the button
 
     const setTime = 300;
 
-    const handleButtonClick = (colorIndex, positionValue ) => {
+    const handleButtonClick = (colorIndex, positionValue) => {
       updateColorInShader(colorOptions[colorIndex - 1]);
       object.position.x -= positionValue;
       setTimeout(() => {
         object.position.x += positionValue;
       }, setTime);
-    }
+    };
 
     switch (object.name) {
       case 'btnOFF001':
@@ -311,7 +380,10 @@ const clickButton = (event) => {
           sound.pause();
           isAudioPlaying = false;
         }
-        handleButtonClick(0, 0.03)
+        object.position.x -= 0.03;
+        setTimeout(() => {
+          object.position.x += 0.03;
+        }, setTime);
         break;
       case 'btn1001':
         handleButtonClick(1, 0.06);
@@ -333,13 +405,17 @@ const clickButton = (event) => {
         const top = point.x < 0 && Math.abs(point.y) < Math.abs(point.x);
         const bottom = point.x > 0 && Math.abs(point.y) < Math.abs(point.x);
 
-        const handleCrossButton = (rotationAxis, rotationValue, shaderIncrementValue) => {
+        const handleCrossButton = (
+          rotationAxis,
+          rotationValue,
+          shaderIncrementValue
+        ) => {
           object.rotation[rotationAxis] += rotationValue; //rotate left
           setTimeout(() => {
             object.rotation[rotationAxis] -= rotationValue;
           }, setTime);
           updateShapeInShader({ incrementNr: shaderIncrementValue });
-        }
+        };
 
         if (object.name === 'btnCross001') {
           if (left) {
@@ -361,22 +437,14 @@ const clickButton = (event) => {
 
 $canvas.addEventListener('click', clickButton);
 
-// ========   Raycasting  - store mouse coordinates  ======== //
+// ========   Raycasting   ======== //
 const onPointerMove = (event) => {
   // calculate pointer position in normalized device coordinates
   mousePointer.x = (event.clientX / window.innerWidth) * 2 - 1;
   mousePointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
 };
 
-window.addEventListener('pointermove', onPointerMove); 
-
-window.addEventListener('pointerout', () => {
-  if (currentHoveredObject) {
-    currentHoveredObject.material.color.set(colorDevice.dark); // Reset to its default color
-    currentHoveredObject = null;
-  }
-});
-
+window.addEventListener('pointermove', onPointerMove);
 
 //on resize -> update size, camera and renderer
 window.addEventListener('resize', () => {
